@@ -1,0 +1,156 @@
+{
+ "id": "rej-qlinearmatmul-834f6d",
+ "cls": "rejects-valid-model",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(N) node with name 'nN_QLin",
+ "raw_signatures": [
+  "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(N) node with name 'nN_QLin"
+ ],
+ "hits": 1146,
+ "seed": 162,
+ "ops": [
+  "QLinearMatMul"
+ ],
+ "fused_ops": {
+  "disable": [],
+  "extended": [],
+  "all": []
+ },
+ "detail": {
+  "errors": {
+   "disable": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'",
+   "extended": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'",
+   "all": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'"
+  },
+  "stage": "load"
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QLinearMatMul",
+    "inputs": [
+     "a1",
+     "c2",
+     "c3",
+     "w4",
+     "c5",
+     "c6",
+     "c7",
+     "c8"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "a1",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "M",
+     "K"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "w4",
+    "dtype": "int8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "K",
+     "N"
+    ]
+   },
+   {
+    "name": "c5",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c6",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c7",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c8",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t9"
+  ],
+  "meta": {
+   "pattern": "qlinear_matmul",
+   "seed": 162,
+   "gen": 2,
+   "tags": [
+    "q-boundary",
+    "rare-type-combo",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input a1: uint8[1, 1] = [0]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [0]\nconst w4: int8[1, 1] = [0]\nconst c5: float32[] = [1]\nconst c6: int8[] = [0]\nconst c7: float32[] = [1]\nconst c8: int8[] = [0]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+}

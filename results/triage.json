@@ -1,0 +1,387 @@
+{
+ "nan-quantizelinear-dequantizelinear-4686bf": {
+  "verdict": "ort-bug",
+  "title": "RC3: QuantizeLinear to float8 with saturate=0 mis-handles the rounding band just above FLT_MAX",
+  "known": "No matching issue found (searched 'float8 saturate false', 'E5M2 NaN instead of infinity'); [#16938](https://github.com/microsoft/onnxruntime/issues/16938) is a different float8 off-by-one.",
+  "summary": "ONNX Cast/QuantizeLinear float8 table (saturate=False): `[x] > FLT_MAX -> NaN` for E4M3FN and `-> Inf` for E5M2, where [x] is x rounded (RNE) to the target mantissa. onnx.reference agrees. ORT 1.30 CPU: E4M3FN maps |x/scale| in [480, 496) to +/-448 (a finite value) although 479 and 496 map to NaN - non-monotonic and contradicting the table; E5M2 maps (61440, 65536) to NaN instead of +/-Inf. Swept exhaustively in 0.25/16 steps; same for per-tensor, per-axis and blocked.",
+  "root_cause": "RC3-float8-saturate-false"
+ },
+ "nan-quantizelinear-dequantizelinear-55b8e3": {
+  "verdict": "ort-bug",
+  "title": "RC3: QuantizeLinear to float8 with saturate=0 mis-handles the rounding band just above FLT_MAX",
+  "known": "No matching issue found (searched 'float8 saturate false', 'E5M2 NaN instead of infinity'); [#16938](https://github.com/microsoft/onnxruntime/issues/16938) is a different float8 off-by-one.",
+  "summary": "ONNX Cast/QuantizeLinear float8 table (saturate=False): `[x] > FLT_MAX -> NaN` for E4M3FN and `-> Inf` for E5M2, where [x] is x rounded (RNE) to the target mantissa. onnx.reference agrees. ORT 1.30 CPU: E4M3FN maps |x/scale| in [480, 496) to +/-448 (a finite value) although 479 and 496 map to NaN - non-monotonic and contradicting the table; E5M2 maps (61440, 65536) to NaN instead of +/-Inf. Swept exhaustively in 0.25/16 steps; same for per-tensor, per-axis and blocked.",
+  "root_cause": "RC3-float8-saturate-false"
+ },
+ "nan-matmul-347847": {
+  "verdict": "by-design",
+  "title": "RC2: DQ(int4 blocked)->MatMul is fused into MatMulNBits with int8-quantized activations by default",
+  "known": "Behaviour is controlled by session option `session.qdq_matmulnbits_accuracy_level` (default 4). Accuracy impact on LLMs reported in [#29849](https://github.com/microsoft/onnxruntime/issues/29849) (open).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL, DequantizeLinear(int4/uint4, blocked, axis=0) feeding a float MatMul is replaced by com.microsoft.MatMulNBits with accuracy_level=4, which quantizes the *float activations* to int8 per block. The unoptimized graph (and the spec) compute a float32 MatMul, so the optimized result deviates by far more than float32 rounding (87 sampled realistic-scale cases: largest error per case relative to the largest output magnitude has a median of 0.6% and a maximum of 6.5%). Setting `session.qdq_matmulnbits_accuracy_level` to 0 removes every deviation (verified). It is a documented speed/accuracy trade-off, but it is applied silently by a graph optimization level that is on by default - worth a clear note, not a kernel bug.",
+  "root_cause": "RC2-matmulnbits-accuracy-level"
+ },
+ "nan-quantizelinear-dequantizelinear-quantize-fea0cb": {
+  "verdict": "ort-bug",
+  "title": "RC1: DoubleQDQPairsRemover re-quantizes Q1->DQ1->Q2->DQ2 onto a *new* grid (graph optimization changes results)",
+  "known": "No matching issue found (searched 'DoubleQDQPairsRemover', 'double QDQ'); related but different: [#32132](https://github.com/microsoft/onnxruntime/issues/32132) (fused QLinear* off by k steps), [#28030](https://github.com/microsoft/onnxruntime/issues/28030) (double QDQ crash, closed).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL the `DoubleQDQPairsRemover` replaces Q1(s1,z1)->DQ1->Q2(s2,z2)->DQ2 by a single Q->DQ pair whose scale is `(min(real_max1,real_max2)-max(real_min1,real_min2))/(qmax-qmin)` (onnxruntime/core/optimizer/double_qdq_pairs_remover.cc, FindNewZeroPointAndScale). That new grid is neither s1 nor s2, so values that the original graph snaps to the s1 grid (or to the coarser s2 grid) come out different: e.g. int16, x=-6.504, s1=1, s2=0.001 gives -7.0 unoptimized (spec) but -6.504 optimized; uint16 x=20000, s1=s2=1, z2=30458 gives 20000 vs 19999.8. When the two pairs have equal ranges but different zero points the result is off by up to several LSBs. The ONNX spec defines the graph as the composition of the four ops, so the optimized result is non-conforming. Realistic scales; extreme-scale variants additionally overflow the new-scale computation (inf/NaN outputs for x=0).",
+  "root_cause": "RC1-double-qdq-remover"
+ },
+ "mm-matmul-f7b7d9": {
+  "verdict": "by-design",
+  "title": "RC2: DQ(int4 blocked)->MatMul is fused into MatMulNBits with int8-quantized activations by default",
+  "known": "Behaviour is controlled by session option `session.qdq_matmulnbits_accuracy_level` (default 4). Accuracy impact on LLMs reported in [#29849](https://github.com/microsoft/onnxruntime/issues/29849) (open).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL, DequantizeLinear(int4/uint4, blocked, axis=0) feeding a float MatMul is replaced by com.microsoft.MatMulNBits with accuracy_level=4, which quantizes the *float activations* to int8 per block. The unoptimized graph (and the spec) compute a float32 MatMul, so the optimized result deviates by far more than float32 rounding (87 sampled realistic-scale cases: largest error per case relative to the largest output magnitude has a median of 0.6% and a maximum of 6.5%). Setting `session.qdq_matmulnbits_accuracy_level` to 0 removes every deviation (verified). It is a documented speed/accuracy trade-off, but it is applied silently by a graph optimization level that is on by default - worth a clear note, not a kernel bug.",
+  "root_cause": "RC2-matmulnbits-accuracy-level"
+ },
+ "mm-matmul-e6c919": {
+  "verdict": "by-design",
+  "title": "RC2: DQ(int4 blocked)->MatMul is fused into MatMulNBits with int8-quantized activations by default",
+  "known": "Behaviour is controlled by session option `session.qdq_matmulnbits_accuracy_level` (default 4). Accuracy impact on LLMs reported in [#29849](https://github.com/microsoft/onnxruntime/issues/29849) (open).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL, DequantizeLinear(int4/uint4, blocked, axis=0) feeding a float MatMul is replaced by com.microsoft.MatMulNBits with accuracy_level=4, which quantizes the *float activations* to int8 per block. The unoptimized graph (and the spec) compute a float32 MatMul, so the optimized result deviates by far more than float32 rounding (87 sampled realistic-scale cases: largest error per case relative to the largest output magnitude has a median of 0.6% and a maximum of 6.5%). Setting `session.qdq_matmulnbits_accuracy_level` to 0 removes every deviation (verified). It is a documented speed/accuracy trade-off, but it is applied silently by a graph optimization level that is on by default - worth a clear note, not a kernel bug.",
+  "root_cause": "RC2-matmulnbits-accuracy-level"
+ },
+ "mm-quantizelinear-dequantizelinear-quantize-ce328a": {
+  "verdict": "ort-bug",
+  "title": "RC1: DoubleQDQPairsRemover re-quantizes Q1->DQ1->Q2->DQ2 onto a *new* grid (graph optimization changes results)",
+  "known": "No matching issue found (searched 'DoubleQDQPairsRemover', 'double QDQ'); related but different: [#32132](https://github.com/microsoft/onnxruntime/issues/32132) (fused QLinear* off by k steps), [#28030](https://github.com/microsoft/onnxruntime/issues/28030) (double QDQ crash, closed).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL the `DoubleQDQPairsRemover` replaces Q1(s1,z1)->DQ1->Q2(s2,z2)->DQ2 by a single Q->DQ pair whose scale is `(min(real_max1,real_max2)-max(real_min1,real_min2))/(qmax-qmin)` (onnxruntime/core/optimizer/double_qdq_pairs_remover.cc, FindNewZeroPointAndScale). That new grid is neither s1 nor s2, so values that the original graph snaps to the s1 grid (or to the coarser s2 grid) come out different: e.g. int16, x=-6.504, s1=1, s2=0.001 gives -7.0 unoptimized (spec) but -6.504 optimized; uint16 x=20000, s1=s2=1, z2=30458 gives 20000 vs 19999.8. When the two pairs have equal ranges but different zero points the result is off by up to several LSBs. The ONNX spec defines the graph as the composition of the four ops, so the optimized result is non-conforming. Realistic scales; extreme-scale variants additionally overflow the new-scale computation (inf/NaN outputs for x=0).",
+  "root_cause": "RC1-double-qdq-remover"
+ },
+ "mm-quantizelinear-dequantizelinear-6963b7": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-relu-f5f010": {
+  "verdict": "ort-bug",
+  "title": "RC1: DoubleQDQPairsRemover re-quantizes Q1->DQ1->Q2->DQ2 onto a *new* grid (graph optimization changes results)",
+  "known": "No matching issue found (searched 'DoubleQDQPairsRemover', 'double QDQ'); related but different: [#32132](https://github.com/microsoft/onnxruntime/issues/32132) (fused QLinear* off by k steps), [#28030](https://github.com/microsoft/onnxruntime/issues/28030) (double QDQ crash, closed).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL the `DoubleQDQPairsRemover` replaces Q1(s1,z1)->DQ1->Q2(s2,z2)->DQ2 by a single Q->DQ pair whose scale is `(min(real_max1,real_max2)-max(real_min1,real_min2))/(qmax-qmin)` (onnxruntime/core/optimizer/double_qdq_pairs_remover.cc, FindNewZeroPointAndScale). That new grid is neither s1 nor s2, so values that the original graph snaps to the s1 grid (or to the coarser s2 grid) come out different: e.g. int16, x=-6.504, s1=1, s2=0.001 gives -7.0 unoptimized (spec) but -6.504 optimized; uint16 x=20000, s1=s2=1, z2=30458 gives 20000 vs 19999.8. When the two pairs have equal ranges but different zero points the result is off by up to several LSBs. The ONNX spec defines the graph as the composition of the four ops, so the optimized result is non-conforming. Realistic scales; extreme-scale variants additionally overflow the new-scale computation (inf/NaN outputs for x=0).",
+  "root_cause": "RC1-double-qdq-remover"
+ },
+ "mm-qlinearmatmul-2baa28": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "mm-mul-6eee63": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-mul-302968": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-qlinearconv-32c8d6": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "mm-add-d14801": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-add-0d23de": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-qlinearmatmul-19218d": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "mm-qlinearmul-408803": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-quantizelinear-dequantizelinear-quantize-ef0593": {
+  "verdict": "ort-bug",
+  "title": "RC1: DoubleQDQPairsRemover re-quantizes Q1->DQ1->Q2->DQ2 onto a *new* grid (graph optimization changes results)",
+  "known": "No matching issue found (searched 'DoubleQDQPairsRemover', 'double QDQ'); related but different: [#32132](https://github.com/microsoft/onnxruntime/issues/32132) (fused QLinear* off by k steps), [#28030](https://github.com/microsoft/onnxruntime/issues/28030) (double QDQ crash, closed).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL the `DoubleQDQPairsRemover` replaces Q1(s1,z1)->DQ1->Q2(s2,z2)->DQ2 by a single Q->DQ pair whose scale is `(min(real_max1,real_max2)-max(real_min1,real_min2))/(qmax-qmin)` (onnxruntime/core/optimizer/double_qdq_pairs_remover.cc, FindNewZeroPointAndScale). That new grid is neither s1 nor s2, so values that the original graph snaps to the s1 grid (or to the coarser s2 grid) come out different: e.g. int16, x=-6.504, s1=1, s2=0.001 gives -7.0 unoptimized (spec) but -6.504 optimized; uint16 x=20000, s1=s2=1, z2=30458 gives 20000 vs 19999.8. When the two pairs have equal ranges but different zero points the result is off by up to several LSBs. The ONNX spec defines the graph as the composition of the four ops, so the optimized result is non-conforming. Realistic scales; extreme-scale variants additionally overflow the new-scale computation (inf/NaN outputs for x=0).",
+  "root_cause": "RC1-double-qdq-remover"
+ },
+ "mm-quantizelinear-f7b541": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-qlinearmul-c80736": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "mm-quantizelinear-dequantizelinear-c2024e": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-quantizelinear-1c3dbc": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-quantizelinear-162487": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-qlinearconv-dab856": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "mm-matmul-ef058a": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "mm-conv-5acfa0": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "mm-quantizelinear-cb55fa": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-relu-f35585": {
+  "verdict": "ort-bug",
+  "title": "RC1: DoubleQDQPairsRemover re-quantizes Q1->DQ1->Q2->DQ2 onto a *new* grid (graph optimization changes results)",
+  "known": "No matching issue found (searched 'DoubleQDQPairsRemover', 'double QDQ'); related but different: [#32132](https://github.com/microsoft/onnxruntime/issues/32132) (fused QLinear* off by k steps), [#28030](https://github.com/microsoft/onnxruntime/issues/28030) (double QDQ crash, closed).",
+  "summary": "At ORT_ENABLE_EXTENDED/ALL the `DoubleQDQPairsRemover` replaces Q1(s1,z1)->DQ1->Q2(s2,z2)->DQ2 by a single Q->DQ pair whose scale is `(min(real_max1,real_max2)-max(real_min1,real_min2))/(qmax-qmin)` (onnxruntime/core/optimizer/double_qdq_pairs_remover.cc, FindNewZeroPointAndScale). That new grid is neither s1 nor s2, so values that the original graph snaps to the s1 grid (or to the coarser s2 grid) come out different: e.g. int16, x=-6.504, s1=1, s2=0.001 gives -7.0 unoptimized (spec) but -6.504 optimized; uint16 x=20000, s1=s2=1, z2=30458 gives 20000 vs 19999.8. When the two pairs have equal ranges but different zero points the result is off by up to several LSBs. The ONNX spec defines the graph as the composition of the four ops, so the optimized result is non-conforming. Realistic scales; extreme-scale variants additionally overflow the new-scale computation (inf/NaN outputs for x=0).",
+  "root_cause": "RC1-double-qdq-remover"
+ },
+ "mm-quantizelinear-b7b255": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-quantizelinear-36bc7e": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-quantizelinear-0e4b8c": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-quantizelinear-744260": {
+  "verdict": "ort-bug",
+  "title": "RC4: blocked (and 4-bit) QuantizeLinear saturates to the WRONG end when abs(x/scale) >= 2^31 (incl. x=+inf)",
+  "known": "No matching issue found (searched 'QuantizeLinear block_size saturation', 'int4 wrong saturation').",
+  "summary": "Spec: y = saturate(round(x/scale)+zp). ORT returns the type *minimum* (or, with a negative zero point, the maximum) when |x/scale| >= 2^31 or x=+/-inf, e.g. uint8, blocked along a non-innermost axis, x=+inf -> 0 instead of 255; int4 blocked, x=-3e38, zp=-7 -> +7 instead of -8. Layout matters (probed with x=+inf, scale 1, zp 0): uint8/int8/int16/uint16 are wrong when the blocked axis is not the innermost one and right otherwise; int4/uint4 are also wrong for per-axis quantization of the innermost axis. Per-tensor is always right. Values below 2^31 are always right, which points at a float->int32 conversion before clamping (x86 cvtps2dq returns 0x80000000 for out-of-range input) in the strided/scalar code path - a hypothesis, not verified in the source. +inf activations (fp overflow upstream) make this reachable with ordinary scales.",
+  "root_cause": "RC4-blocked-q-int32-overflow"
+ },
+ "mm-mul-0a9a3d": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-mul-670d5f": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-add-c06392": {
+  "verdict": "ort-bug",
+  "title": "RC5: QLinearAdd/QLinearMul (incl. fused DQ->Add/Mul->Q) saturate to the wrong end when the requantized value exceeds int32",
+  "known": "No matching issue found (searched 'QLinearAdd QLinearMul saturation overflow').",
+  "summary": "com.microsoft.QLinearAdd/QLinearMul (used by ORT's QDQ fusion of DQ->Add/Mul->Q at EXTENDED/ALL) return qmin instead of qmax (or vice versa) when (A*B or A+B)/C_scale is beyond ~2^31, e.g. uint8 a=229, a_scale=3000, c_scale=1e-4: exact 6.9e9 saturates to 255, ORT returns 0. The unfused graph is correct, so the fusion changes the result from 255 to 0. Requires a large ratio between input and output scales (badly calibrated model) - plausible but uncommon: only 8 of the 532 campaign hits used scales inside [1e-12, 1e12]; the rest overlap with the degenerate-scale regime of RC6.",
+  "root_cause": "RC5-qlinear-binary-overflow"
+ },
+ "mm-matmul-6a9f21": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-mul-0602d8": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-mul-61f545": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-qlinearmul-634349": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-qlinearmul-b4fab1": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-qlinearmatmul-31f3be": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-qlinearconv-6c81e2": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-qlinearconv-a5e2a9": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-matmul-7b6d61": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-qlinearmatmul-108f5b": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-conv-8de96b": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "obo-conv-relu-7a6628": {
+  "verdict": "ort-bug-degenerate",
+  "title": "RC6: requantization multiplier folded in float32 breaks for extreme / subnormal scales (QLinearMatMul, QLinearConv, QLinearMul, fused variants)",
+  "known": "Not searched further - degenerate inputs; related saturation class: [#29727](https://github.com/microsoft/onnxruntime/issues/29727) (QLinearSoftmax saturation, closed).",
+  "summary": "ORT folds a_scale*b_scale/y_scale into one float32 multiplier. With scales outside ~[1e-12,1e12] the product under/overflows (subnormal -> few mantissa bits, or inf -> 0*inf = NaN -> garbage int), producing off-by-one/two results far from any rounding tie, or even qmin for acc=0 (expected: the zero point). The spec defines the exact result, so these are real non-conformances, but only with scales no real quantizer emits. Reported for completeness; low priority.",
+  "root_cause": "RC6-requant-float32-extreme-scales"
+ },
+ "rej-convinteger-f1891a": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ },
+ "rej-qlinearmatmul-834f6d": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ },
+ "rej-qlinearconv-e7eef0": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ },
+ "rej-qlinearmatmul-65200e": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ },
+ "rej-matmulinteger-76e216": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ },
+ "rej-quantizelinear-286034": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ },
+ "rej-dequantizelinear-872574": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ },
+ "rej-quantizelinear-dequantizelinear-436772": {
+  "verdict": "unsupported",
+  "title": "RC7: valid models rejected (type combinations / per-row / per-channel zero points / blocked-with-1-block)",
+  "known": "Per-row MatMulInteger zero point: [#27897](https://github.com/microsoft/onnxruntime/issues/27897) (closed, still rejected in 1.30); per-channel QLinearConv zero points: [#28447](https://github.com/microsoft/onnxruntime/issues/28447); QLinearMatMul zero-point shape limits: [#15442](https://github.com/microsoft/onnxruntime/issues/15442) (open).",
+  "summary": "ORT's CPU EP errors out on models the ONNX checker accepts: QLinearMatMul/QLinearConv implement only (u8,u8,u8), (u8,s8,u8), (s8,s8,s8) of the 8 legal (a,b,y) type combos; MatMulInteger/QLinearMatMul reject per-row a zero points; ConvInteger rejects per-output-channel w zero points; Q/DQ with block_size>0 and exactly one block (scale shape [1]) is rejected as 'per-tensor with block_size'. These are loud failures (no wrong numbers) - conformance gaps, not correctness bugs.",
+  "root_cause": "RC7-rejects-valid"
+ }
+}

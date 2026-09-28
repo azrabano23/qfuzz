@@ -1,0 +1,221 @@
+{
+ "id": "obo-matmul-7b6d61",
+ "cls": "off-by-one",
+ "levels": [
+  "all",
+  "extended"
+ ],
+ "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>MatMul>QuantizeLinear|uint8|extreme-scale|dq_matmul_q",
+ "raw_signatures": [
+  "off-by-one|all,extended|MatMul|uint8|extreme-scale|dq_matmul_q"
+ ],
+ "hits": 12,
+ "seed": 19351,
+ "ops": [
+  "DequantizeLinear",
+  "DequantizeLinear",
+  "MatMul",
+  "QuantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "DequantizeLinear",
+   "DequantizeLinear",
+   "MatMul",
+   "QuantizeLinear"
+  ],
+  "extended": [
+   "QLinearMatMul"
+  ],
+  "all": [
+   "QLinearMatMul"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t12",
+  "level": "extended",
+  "max_excess": 1.0,
+  "max_diff": 1.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0
+   ],
+   "got": 147,
+   "want": 146,
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "a1",
+     "c3",
+     "c4"
+    ],
+    "outputs": [
+     "t5"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "w2",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t8"
+    ],
+    "attrs": {
+     "axis": 1
+    },
+    "domain": ""
+   },
+   {
+    "op": "MatMul",
+    "inputs": [
+     "t5",
+     "t8"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "t9",
+     "c10",
+     "c11"
+    ],
+    "outputs": [
+     "t12"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "a1",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     190
+    ],
+    "dims": [
+     "M",
+     "K"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "w2",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     80
+    ],
+    "dims": [
+     "K",
+     "N"
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     0.0005779999773949385
+    ],
+    "dims": []
+   },
+   {
+    "name": "c4",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     128
+    ],
+    "dims": []
+   },
+   {
+    "name": "c6",
+    "dtype": "float32",
+    "shape": [
+     1
+    ],
+    "data": [
+     5.000001076526666e-40
+    ],
+    "dims": [
+     "N"
+    ]
+   },
+   {
+    "name": "c7",
+    "dtype": "uint8",
+    "shape": [
+     1
+    ],
+    "data": [
+     128
+    ],
+    "dims": [
+     "N"
+    ]
+   },
+   {
+    "name": "c10",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     8.000012932830381e-42
+    ],
+    "dims": []
+   },
+   {
+    "name": "c11",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     254
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t12"
+  ],
+  "meta": {
+   "pattern": "dq_matmul_q",
+   "seed": 19351,
+   "gen": 2,
+   "tags": [
+    "per-col",
+    "q-boundary",
+    "scale-subnormal",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input a1: uint8[1, 1] = [190]\nconst w2: uint8[1, 1] = [80]\nconst c3: float32[] = [0.000577999977]\nconst c4: uint8[] = [128]\nconst c6: float32[1] = [5.00000108e-40]\nconst c7: uint8[1] = [128]\nconst c10: float32[] = [8.00001293e-42]\nconst c11: uint8[] = [254]\nt5 = DequantizeLinear(a1, c3, c4)\nt8 = DequantizeLinear(w2, c6, c7) {'axis': 1}\nt9 = MatMul(t5, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+}

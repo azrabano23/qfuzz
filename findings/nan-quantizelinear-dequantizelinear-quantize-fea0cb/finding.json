@@ -1,0 +1,187 @@
+{
+ "id": "nan-quantizelinear-dequantizelinear-quantize-fea0cb",
+ "cls": "nan-inf",
+ "levels": [
+  "all",
+  "extended"
+ ],
+ "min_signature": "nan-inf|all,extended|QuantizeLinear>DequantizeLinear>QuantizeLinear>DequantizeLinear|float32|extreme-scale|qdq",
+ "raw_signatures": [
+  "nan-inf|all,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|qdq"
+ ],
+ "hits": 1,
+ "seed": 40813,
+ "ops": [
+  "QuantizeLinear",
+  "DequantizeLinear",
+  "QuantizeLinear",
+  "DequantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QuantizeLinear",
+   "DequantizeLinear",
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ],
+  "extended": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ],
+  "all": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t9",
+  "level": "extended",
+  "max_excess": Infinity,
+  "max_diff": 0.0,
+  "n_bad": 1,
+  "n_inexact": 0,
+  "example": {
+   "index": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "got": "nan",
+   "want": 0,
+   "slack": 1.401298464324817e-45
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "t4",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t5"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "t5",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t8"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "t8",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "data": [
+     0.0
+    ],
+    "dims": [
+     "d0",
+     "d1",
+     "d2",
+     "d3"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     3.0000001227554363e+34
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint16",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c6",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.9999999580429536e+34
+    ],
+    "dims": []
+   },
+   {
+    "name": "c7",
+    "dtype": "uint16",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t9"
+  ],
+  "meta": {
+   "pattern": "qdq",
+   "seed": 40813,
+   "gen": 2,
+   "tags": [
+    "scale-huge",
+    "ties"
+   ],
+   "dtype": "uint16",
+   "stages": 2
+  }
+ },
+ "description": "input x1: float32[1, 1, 1, 1] = [0]\nconst c2: float32[] = [3.00000012e+34]\nconst c3: uint16[] = [0]\nconst c6: float32[] = [1.99999996e+34]\nconst c7: uint16[] = [0]\nt4 = QuantizeLinear(x1, c2, c3)\nt5 = DequantizeLinear(t4, c2, c3)\nt8 = QuantizeLinear(t5, c6, c7)\nt9 = DequantizeLinear(t8, c6, c7)\noutputs: t9"
+}

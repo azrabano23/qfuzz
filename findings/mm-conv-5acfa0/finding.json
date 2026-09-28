@@ -1,0 +1,358 @@
+{
+ "id": "mm-conv-5acfa0",
+ "cls": "mismatch",
+ "levels": [
+  "all",
+  "extended"
+ ],
+ "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>DequantizeLinear>Conv>QuantizeLinear|uint8|extreme-scale|dq_conv_q",
+ "raw_signatures": [
+  "mismatch|all,extended|Conv|uint8|extreme-scale|dq_conv_q"
+ ],
+ "hits": 35,
+ "seed": 101,
+ "ops": [
+  "DequantizeLinear",
+  "DequantizeLinear",
+  "DequantizeLinear",
+  "Conv",
+  "QuantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "DequantizeLinear",
+   "DequantizeLinear",
+   "DequantizeLinear",
+   "Conv",
+   "QuantizeLinear"
+  ],
+  "extended": [
+   "QLinearConv"
+  ],
+  "all": [
+   "Transpose",
+   "com.microsoft.QLinearConv",
+   "Transpose"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t15",
+  "level": "extended",
+  "max_excess": 248.0,
+  "max_diff": 255.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    31,
+    0,
+    0
+   ],
+   "got": 255,
+   "want": 0,
+   "slack": 7
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "w5",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t8"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "c9",
+     "c10"
+    ],
+    "outputs": [
+     "t11"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "Conv",
+    "inputs": [
+     "t4",
+     "t8",
+     "t11"
+    ],
+    "outputs": [
+     "t12"
+    ],
+    "attrs": {
+     "kernel_shape": [
+      1,
+      1
+     ],
+     "group": 32
+    },
+    "domain": ""
+   },
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "t12",
+     "c13",
+     "c14"
+    ],
+    "outputs": [
+     "t15"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     32,
+     1,
+     1
+    ],
+    "data": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     "N",
+     null,
+     "S0",
+     "S1"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "w5",
+    "dtype": "uint8",
+    "shape": [
+     32,
+     1,
+     1,
+     1
+    ],
+    "data": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   {
+    "name": "c6",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     7.006492321624085e-43
+    ],
+    "dims": []
+   },
+   {
+    "name": "c7",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c9",
+    "dtype": "int32",
+    "shape": [
+     32
+    ],
+    "data": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1874
+    ],
+    "dims": [
+     null
+    ]
+   },
+   {
+    "name": "c10",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     0.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c13",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.401298464324817e-45
+    ],
+    "dims": []
+   },
+   {
+    "name": "c14",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t15"
+  ],
+  "meta": {
+   "pattern": "dq_conv_q",
+   "seed": 101,
+   "gen": 2,
+   "tags": [
+    "depthwise",
+    "scale-subnormal",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input x1: uint8[1, 32, 1, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [0]\nconst w5: uint8[32, 1, 1, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c6: float32[] = [7.00649232e-43]\nconst c7: uint8[] = [0]\nconst c9: int32[32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c10: float32[] = [0]\nconst c13: float32[] = [1.40129846e-45]\nconst c14: uint8[] = [0]\nt4 = DequantizeLinear(x1, c2, c3)\nt8 = DequantizeLinear(w5, c6, c7)\nt11 = DequantizeLinear(c9, c10)\nt12 = Conv(t4, t8, t11) {'kernel_shape': [1, 1], 'group': 32}\nt15 = QuantizeLinear(t12, c13, c14)\noutputs: t15"
+}

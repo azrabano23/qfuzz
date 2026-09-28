@@ -1,0 +1,127 @@
+{
+ "id": "rej-matmulinteger-76e216",
+ "cls": "rejects-valid-model",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "rejects-valid-model|all,disable,extended|MatMulInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running MatMulInteger node.  Status Message: onnxrun",
+ "raw_signatures": [
+  "rejects-valid-model|all,disable,extended|MatMulInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running MatMulInteger node.  Status Message: onnxrun"
+ ],
+ "hits": 265,
+ "seed": 446,
+ "ops": [
+  "MatMulInteger"
+ ],
+ "fused_ops": {
+  "disable": [
+   "MatMulInteger"
+  ],
+  "extended": [
+   "MatMulInteger"
+  ],
+  "all": [
+   "MatMulInteger"
+  ]
+ },
+ "detail": {
+  "errors": {
+   "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b",
+   "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b",
+   "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b"
+  },
+  "stage": "run"
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "MatMulInteger",
+    "inputs": [
+     "a1",
+     "b2",
+     "c3",
+     "c4"
+    ],
+    "outputs": [
+     "t5"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "a1",
+    "dtype": "int8",
+    "shape": [
+     2,
+     1
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "M",
+     "K"
+    ]
+   },
+   {
+    "name": "b2",
+    "dtype": "int8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "K",
+     "N"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c3",
+    "dtype": "int8",
+    "shape": [
+     2
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "M"
+    ]
+   },
+   {
+    "name": "c4",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t5"
+  ],
+  "meta": {
+   "pattern": "matmul_integer",
+   "seed": 446,
+   "gen": 2,
+   "tags": [
+    "per-row-a",
+    "scale-subnormal"
+   ]
+  }
+ },
+ "description": "input a1: int8[2, 1] = [0, 0]\ninput b2: int8[1, 1] = [0]\nconst c3: int8[2] = [0, 0]\nconst c4: int8[] = [0]\nt5 = MatMulInteger(a1, b2, c3, c4)\noutputs: t5"
+}

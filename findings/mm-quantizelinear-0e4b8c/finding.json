@@ -1,0 +1,143 @@
+{
+ "id": "mm-quantizelinear-0e4b8c",
+ "cls": "mismatch",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "mismatch|all,disable,extended|QuantizeLinear|int16|normal|quantize",
+ "raw_signatures": [
+  "mismatch|all,disable,extended|QuantizeLinear|int16|normal|quantize"
+ ],
+ "hits": 7,
+ "seed": 1908,
+ "ops": [
+  "QuantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QuantizeLinear"
+  ],
+  "extended": [
+   "QuantizeLinear"
+  ],
+  "all": [
+   "QuantizeLinear"
+  ]
+ },
+ "detail": {
+  "regime": "normal",
+  "output": "t4",
+  "level": "disable",
+  "max_excess": 65535.0,
+  "max_diff": 65535.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0,
+    0
+   ],
+   "got": -32768,
+   "want": 32767,
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {
+     "axis": 1,
+     "block_size": 2
+    },
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "float32",
+    "shape": [
+     1,
+     2,
+     2
+    ],
+    "data": [
+     3.0000000054977558e+38,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "dims": [
+     "d0",
+     null,
+     "d2"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     2
+    ],
+    "data": [
+     1.0,
+     1.0
+    ],
+    "dims": [
+     "d0",
+     null,
+     "d2"
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "int16",
+    "shape": [
+     1,
+     1,
+     2
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "d0",
+     null,
+     "d2"
+    ]
+   }
+  ],
+  "outputs": [
+   "t4"
+  ],
+  "meta": {
+   "pattern": "quantize",
+   "seed": 1908,
+   "gen": 2,
+   "tags": [
+    "blocked",
+    "specials"
+   ],
+   "dtype": "int16"
+  }
+ },
+ "description": "input x1: float32[1, 2, 2] = [3.00000001e+38, 0, 0, 0]\nconst c2: float32[1, 1, 2] = [1, 1]\nconst c3: int16[1, 1, 2] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 1, 'block_size': 2}\noutputs: t4"
+}

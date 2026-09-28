@@ -1,0 +1,4473 @@
+{
+ "env": {
+  "onnxruntime": "1.30.0",
+  "onnx": "1.23.0",
+  "numpy": "2.4.6",
+  "python": "3.11.15",
+  "machine": "x86_64",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "isa": [
+   "avx2",
+   "avx512f",
+   "avx512_vnni",
+   "avx_vnni",
+   "amx_int8",
+   "amx_tile"
+  ],
+  "generator_version": 2
+ },
+ "config": {
+  "cases": 150000,
+  "workers": 4,
+  "seed_start": 0,
+  "elapsed_s": 350.1,
+  "levels": [
+   "disable",
+   "extended",
+   "all"
+  ]
+ },
+ "counts": {
+  "exact": 124525,
+  "nan-inf": 519,
+  "within-bound": 11889,
+  "mismatch": 8279,
+  "rejects-valid-model": 4492,
+  "off-by-one": 296
+ },
+ "fusion_bitdiff_cases": 9727,
+ "by_pattern": {
+  "chain": {
+   "exact": 6082,
+   "within-bound": 5,
+   "mismatch": 1
+  },
+  "conv_integer": {
+   "exact": 4768,
+   "rejects-valid-model": 1329
+  },
+  "dequantize": {
+   "exact": 11030,
+   "within-bound": 1143,
+   "rejects-valid-model": 161
+  },
+  "dq_binary_q": {
+   "exact": 6936,
+   "mismatch": 464,
+   "within-bound": 1564,
+   "off-by-one": 101
+  },
+  "dq_conv_q": {
+   "exact": 8738,
+   "within-bound": 433,
+   "mismatch": 35,
+   "off-by-one": 10
+  },
+  "dq_matmul_nbits": {
+   "mismatch": 6163,
+   "nan-inf": 25,
+   "within-bound": 9,
+   "exact": 2
+  },
+  "dq_matmul_q": {
+   "within-bound": 633,
+   "exact": 11592,
+   "mismatch": 40,
+   "off-by-one": 12
+  },
+  "dq_relu_q": {
+   "exact": 6151
+  },
+  "dyn_matmul": {
+   "exact": 6086,
+   "within-bound": 64
+  },
+  "dynamic_quantize": {
+   "exact": 9068,
+   "within-bound": 112
+  },
+  "matmul_integer": {
+   "exact": 8895,
+   "rejects-valid-model": 265
+  },
+  "qdq": {
+   "exact": 5925,
+   "within-bound": 2566,
+   "mismatch": 652,
+   "nan-inf": 1
+  },
+  "qlinear_binary": {
+   "exact": 8975,
+   "mismatch": 130,
+   "off-by-one": 81,
+   "within-bound": 7
+  },
+  "qlinear_conv": {
+   "exact": 7466,
+   "rejects-valid-model": 882,
+   "within-bound": 563,
+   "mismatch": 155,
+   "off-by-one": 46
+  },
+  "qlinear_matmul": {
+   "exact": 10328,
+   "within-bound": 224,
+   "rejects-valid-model": 1568,
+   "off-by-one": 46,
+   "mismatch": 205
+  },
+  "quantize": {
+   "nan-inf": 493,
+   "exact": 12483,
+   "within-bound": 4566,
+   "rejects-valid-model": 287,
+   "mismatch": 434
+  }
+ },
+ "signatures": [
+  {
+   "signature": "nan-inf|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|normal|quantize",
+   "cls": "nan-inf",
+   "count": 300,
+   "seeds": [
+    7,
+    297,
+    392,
+    718,
+    1147
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": Infinity,
+    "max_diff": 0.0,
+    "n_bad": 28,
+    "n_inexact": 0,
+    "example": {
+     "index": [
+      0,
+      1,
+      6,
+      0
+     ],
+     "got": -448,
+     "want": "nan",
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "nan-inf|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|quantize",
+   "cls": "nan-inf",
+   "count": 193,
+   "seeds": [
+    1335,
+    1865,
+    2536,
+    2969,
+    3728
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": Infinity,
+    "max_diff": 0.0,
+    "n_bad": 2,
+    "n_inexact": 0,
+    "example": {
+     "index": [
+      0,
+      6,
+      21
+     ],
+     "got": 448,
+     "want": "nan",
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "nan-inf|all,extended|MatMul|float32|extreme-scale|dq_matmul_nbits",
+   "cls": "nan-inf",
+   "count": 25,
+   "seeds": [
+    2150,
+    3622,
+    5515,
+    12841,
+    29080
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t6",
+    "level": "extended",
+    "max_excess": Infinity,
+    "max_diff": 2.052850812205348e+35,
+    "n_bad": 962,
+    "n_inexact": 930,
+    "example": {
+     "index": [
+      1,
+      1
+     ],
+     "got": "inf",
+     "want": "nan",
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "nan-inf|all,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|qdq",
+   "cls": "nan-inf",
+   "count": 1,
+   "seeds": [
+    40813
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "extended",
+    "max_excess": Infinity,
+    "max_diff": 0.0,
+    "n_bad": 3840,
+    "n_inexact": 0,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": "nan",
+     "want": -49606905020900089300841608707412328448,
+     "slack": 5913603606255198710486108471296
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|MatMul|float32|normal|dq_matmul_nbits",
+   "cls": "mismatch",
+   "count": 5198,
+   "seeds": [
+    44,
+    53,
+    57,
+    149,
+    174
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t6",
+    "level": "extended",
+    "max_excess": 0.10586873139357618,
+    "max_diff": 0.106231689453125,
+    "n_bad": 7,
+    "n_inexact": 7,
+    "example": {
+     "index": [
+      6,
+      0
+     ],
+     "got": 19.301422119140625,
+     "want": 19.40765380859375,
+     "slack": 0.0003629580595488276
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|MatMul|float32|extreme-scale|dq_matmul_nbits",
+   "cls": "mismatch",
+   "count": 965,
+   "seeds": [
+    43,
+    454,
+    653,
+    757,
+    816
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t6",
+    "level": "extended",
+    "max_excess": 1.6918034713372461e+28,
+    "max_diff": 1.7034935945257877e+28,
+    "n_bad": 164,
+    "n_inexact": 165,
+    "example": {
+     "index": [
+      0,
+      4
+     ],
+     "got": -421664787842981627818967826432,
+     "want": -438699723788239504562590842880,
+     "slack": 116901231885414648313282560
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|DequantizeLinear+QuantizeLinear|float32|normal|qdq",
+   "cls": "mismatch",
+   "count": 435,
+   "seeds": [
+    413,
+    640,
+    958,
+    1084,
+    1196
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t9",
+    "level": "extended",
+    "max_excess": 0.0005985053404465313,
+    "max_diff": 0.0008245110511779785,
+    "n_bad": 863,
+    "n_inexact": 1440,
+    "example": {
+     "index": [
+      1,
+      0,
+      3,
+      3
+     ],
+     "got": -1.373911738395691,
+     "want": -1.373313069343567,
+     "slack": 1.637116774921843e-07
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|quantize",
+   "cls": "mismatch",
+   "count": 140,
+   "seeds": [
+    1214,
+    3410,
+    3638,
+    4893,
+    6979
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": 14.999999165534973,
+    "max_diff": 15.0,
+    "n_bad": 6,
+    "n_inexact": 6,
+    "example": {
+     "index": [
+      6,
+      13,
+      1
+     ],
+     "got": -8,
+     "want": 7,
+     "slack": 8.344650268554688e-07
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Relu|float32|normal|qdq",
+   "cls": "mismatch",
+   "count": 133,
+   "seeds": [
+    2131,
+    4647,
+    6910,
+    7855,
+    8254
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t10",
+    "level": "extended",
+    "max_excess": 15.748729705810547,
+    "max_diff": 16.9296875,
+    "n_bad": 1512,
+    "n_inexact": 1626,
+    "example": {
+     "index": [
+      0,
+      6,
+      5,
+      1
+     ],
+     "got": 6959.98193359375,
+     "want": 6944,
+     "slack": 0.23320388793945312
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QLinearMatMul|uint8|extreme-scale|qlinear_matmul",
+   "cls": "mismatch",
+   "count": 132,
+   "seeds": [
+    544,
+    643,
+    2219,
+    2232,
+    7155
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 4.0,
+    "max_diff": 4.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      2,
+      3,
+      0
+     ],
+     "got": 99,
+     "want": 95,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Mul|int8|extreme-scale|dq_binary_q",
+   "cls": "mismatch",
+   "count": 128,
+   "seeds": [
+    1161,
+    2534,
+    3413,
+    4802,
+    7564
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 7,
+    "n_inexact": 7,
+    "example": {
+     "index": [
+      5
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Mul|uint8|extreme-scale|dq_binary_q",
+   "cls": "mismatch",
+   "count": 122,
+   "seeds": [
+    581,
+    1001,
+    1637,
+    2101,
+    2394
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QLinearConv|uint8|extreme-scale|qlinear_conv",
+   "cls": "mismatch",
+   "count": 114,
+   "seeds": [
+    1940,
+    1941,
+    3850,
+    4318,
+    7602
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "disable",
+    "max_excess": 3.0,
+    "max_diff": 3.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      1,
+      0,
+      14,
+      0
+     ],
+     "got": 199,
+     "want": 202,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Add|int8|extreme-scale|dq_binary_q",
+   "cls": "mismatch",
+   "count": 113,
+   "seeds": [
+    96,
+    306,
+    1437,
+    2968,
+    6461
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 10,
+    "n_inexact": 10,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Add|uint8|extreme-scale|dq_binary_q",
+   "cls": "mismatch",
+   "count": 93,
+   "seeds": [
+    40,
+    214,
+    2294,
+    2597,
+    4354
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 7,
+    "n_inexact": 7,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul",
+   "cls": "mismatch",
+   "count": 73,
+   "seeds": [
+    493,
+    734,
+    868,
+    2073,
+    2672
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 254.0,
+    "max_diff": 254.0,
+    "n_bad": 70,
+    "n_inexact": 70,
+    "example": {
+     "index": [
+      0,
+      1
+     ],
+     "got": -127,
+     "want": 127,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QLinearMul|int8|extreme-scale|qlinear_binary",
+   "cls": "mismatch",
+   "count": 68,
+   "seeds": [
+    1164,
+    8196,
+    9035,
+    10668,
+    19709
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 979,
+    "n_inexact": 979,
+    "example": {
+     "index": [
+      0,
+      0,
+      5
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|qdq",
+   "cls": "mismatch",
+   "count": 67,
+   "seeds": [
+    1448,
+    3523,
+    6207,
+    7767,
+    7826
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "extended",
+    "max_excess": 1.696373338859692e-29,
+    "max_diff": 1.6963735394908602e-29,
+    "n_bad": 3,
+    "n_inexact": 3,
+    "example": {
+     "index": [
+      4,
+      0,
+      0,
+      0
+     ],
+     "got": -1.6963735394908602e-29,
+     "want": 0,
+     "slack": 2.006311684113499e-36
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|uint16|extreme-scale|quantize",
+   "cls": "mismatch",
+   "count": 64,
+   "seeds": [
+    2427,
+    3698,
+    4219,
+    5775,
+    6035
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 1869,
+    "n_inexact": 2048,
+    "example": {
+     "index": [
+      0,
+      0,
+      10,
+      28
+     ],
+     "got": 0,
+     "want": 65535,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary",
+   "cls": "mismatch",
+   "count": 62,
+   "seeds": [
+    5134,
+    5756,
+    5895,
+    9484,
+    12592
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 2.0,
+    "max_diff": 2.0,
+    "n_bad": 165,
+    "n_inexact": 165,
+    "example": {
+     "index": [
+      7,
+      1
+     ],
+     "got": 14,
+     "want": 12,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|normal|quantize",
+   "cls": "mismatch",
+   "count": 60,
+   "seeds": [
+    2745,
+    3334,
+    5919,
+    6748,
+    7956
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": 14.999999165534973,
+    "max_diff": 15.0,
+    "n_bad": 14913,
+    "n_inexact": 60273,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      4
+     ],
+     "got": -8,
+     "want": 7,
+     "slack": 8.344650268554688e-07
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|int16|extreme-scale|quantize",
+   "cls": "mismatch",
+   "count": 53,
+   "seeds": [
+    506,
+    990,
+    5236,
+    8385,
+    10421
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 194,
+    "n_inexact": 25025,
+    "example": {
+     "index": [
+      0,
+      4,
+      19,
+      3
+     ],
+     "got": 32767,
+     "want": -32768,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|uint8|extreme-scale|quantize",
+   "cls": "mismatch",
+   "count": 51,
+   "seeds": [
+    7939,
+    8173,
+    8318,
+    10179,
+    14881
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 29,
+    "n_inexact": 29,
+    "example": {
+     "index": [
+      2,
+      1,
+      19,
+      6
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QLinearConv|int8|extreme-scale|qlinear_conv",
+   "cls": "mismatch",
+   "count": 41,
+   "seeds": [
+    9072,
+    14760,
+    15070,
+    22488,
+    30723
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 128.0,
+    "max_diff": 128.0,
+    "n_bad": 124,
+    "n_inexact": 124,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 0,
+     "want": -128,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|MatMul|uint8|extreme-scale|dq_matmul_q",
+   "cls": "mismatch",
+   "count": 40,
+   "seeds": [
+    564,
+    4533,
+    4883,
+    12324,
+    12950
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 127.0,
+    "max_diff": 127.0,
+    "n_bad": 527,
+    "n_inexact": 527,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 128,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Conv|uint8|extreme-scale|dq_conv_q",
+   "cls": "mismatch",
+   "count": 35,
+   "seeds": [
+    101,
+    5567,
+    6241,
+    6363,
+    8707
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t15",
+    "level": "extended",
+    "max_excess": 254.0,
+    "max_diff": 254.0,
+    "n_bad": 8015,
+    "n_inexact": 8038,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 1,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|int8|extreme-scale|quantize",
+   "cls": "mismatch",
+   "count": 32,
+   "seeds": [
+    7628,
+    13032,
+    13076,
+    15941,
+    20337
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 144,
+    "example": {
+     "index": [
+      0,
+      0,
+      2,
+      21
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Relu|float32|extreme-scale|qdq",
+   "cls": "mismatch",
+   "count": 17,
+   "seeds": [
+    12305,
+    17669,
+    19135,
+    20235,
+    23923
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "extended",
+    "max_excess": 2.7194018388226698e-40,
+    "max_diff": 2.719415851807313e-40,
+    "n_bad": 724,
+    "n_inexact": 724,
+    "example": {
+     "index": [
+      8,
+      0,
+      26,
+      0
+     ],
+     "got": 2.719415851807313e-40,
+     "want": 0,
+     "slack": 1.401298464324817e-45
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|int8|normal|quantize",
+   "cls": "mismatch",
+   "count": 12,
+   "seeds": [
+    24342,
+    50648,
+    54578,
+    62744,
+    73565
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      4,
+      0,
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|uint16|normal|quantize",
+   "cls": "mismatch",
+   "count": 9,
+   "seeds": [
+    6799,
+    37758,
+    39378,
+    48031,
+    51312
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 40,
+    "n_inexact": 40,
+    "example": {
+     "index": [
+      3,
+      3,
+      1
+     ],
+     "got": 0,
+     "want": 65535,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|int16|normal|quantize",
+   "cls": "mismatch",
+   "count": 7,
+   "seeds": [
+    1908,
+    26535,
+    37259,
+    38455,
+    38460
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 3,
+    "n_inexact": 3,
+    "example": {
+     "index": [
+      1,
+      0,
+      2
+     ],
+     "got": -32768,
+     "want": 32767,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,disable,extended|QuantizeLinear|uint8|normal|quantize",
+   "cls": "mismatch",
+   "count": 6,
+   "seeds": [
+    8636,
+    28354,
+    43221,
+    72586,
+    100381
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 36,
+    "n_inexact": 36,
+    "example": {
+     "index": [
+      0,
+      0,
+      5,
+      3
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Mul|uint8|normal|dq_binary_q",
+   "cls": "mismatch",
+   "count": 4,
+   "seeds": [
+    12937,
+    15220,
+    45412,
+    138533
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 2,
+    "n_inexact": 2,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Mul|int8|normal|dq_binary_q",
+   "cls": "mismatch",
+   "count": 3,
+   "seeds": [
+    2735,
+    77611,
+    124775
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 627,
+    "n_inexact": 627,
+    "example": {
+     "index": [
+      0,
+      0,
+      1
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|Add|uint8|normal|dq_binary_q",
+   "cls": "mismatch",
+   "count": 1,
+   "seeds": [
+    2518
+   ],
+   "example": {
+    "regime": "normal",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 197,
+    "n_inexact": 197,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "mismatch|all,extended|MatMul|uint8|extreme-scale|chain",
+   "cls": "mismatch",
+   "count": 1,
+   "seeds": [
+    58069
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t23",
+    "level": "extended",
+    "max_excess": 114.0,
+    "max_diff": 114.0,
+    "n_bad": 7,
+    "n_inexact": 7,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 114,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,extended|Mul|uint8|extreme-scale|dq_binary_q",
+   "cls": "off-by-one",
+   "count": 56,
+   "seeds": [
+    1043,
+    16409,
+    19413,
+    19712,
+    21204
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 2,
+    "n_inexact": 2,
+    "example": {
+     "index": [
+      21
+     ],
+     "got": 64,
+     "want": 63,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,extended|Mul|int8|extreme-scale|dq_binary_q",
+   "cls": "off-by-one",
+   "count": 45,
+   "seeds": [
+    1071,
+    3227,
+    4302,
+    10382,
+    10555
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 14,
+    "n_inexact": 14,
+    "example": {
+     "index": [
+      0,
+      8
+     ],
+     "got": 75,
+     "want": 76,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary",
+   "cls": "off-by-one",
+   "count": 42,
+   "seeds": [
+    4373,
+    4884,
+    17957,
+    18682,
+    26528
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 2,
+    "n_inexact": 2,
+    "example": {
+     "index": [
+      10
+     ],
+     "got": 246,
+     "want": 247,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,disable,extended|QLinearMul|int8|extreme-scale|qlinear_binary",
+   "cls": "off-by-one",
+   "count": 39,
+   "seeds": [
+    4346,
+    4402,
+    9166,
+    9580,
+    13758
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 425,
+    "n_inexact": 425,
+    "example": {
+     "index": [
+      0,
+      0,
+      6
+     ],
+     "got": -111,
+     "want": -110,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,disable,extended|QLinearMatMul|uint8|extreme-scale|qlinear_matmul",
+   "cls": "off-by-one",
+   "count": 36,
+   "seeds": [
+    8223,
+    15925,
+    18168,
+    18821,
+    27943
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 18,
+    "n_inexact": 18,
+    "example": {
+     "index": [
+      0,
+      1
+     ],
+     "got": 0,
+     "want": 1,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,disable,extended|QLinearConv|uint8|extreme-scale|qlinear_conv",
+   "cls": "off-by-one",
+   "count": 31,
+   "seeds": [
+    4211,
+    7556,
+    11177,
+    18965,
+    28068
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      2,
+      0
+     ],
+     "got": 205,
+     "want": 204,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,disable,extended|QLinearConv|int8|extreme-scale|qlinear_conv",
+   "cls": "off-by-one",
+   "count": 15,
+   "seeds": [
+    7798,
+    13350,
+    17221,
+    18560,
+    67025
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      2,
+      2,
+      0
+     ],
+     "got": 79,
+     "want": 80,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,extended|MatMul|uint8|extreme-scale|dq_matmul_q",
+   "cls": "off-by-one",
+   "count": 12,
+   "seeds": [
+    19351,
+    19947,
+    23354,
+    39707,
+    45163
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 2,
+    "example": {
+     "index": [
+      6,
+      8
+     ],
+     "got": 179,
+     "want": 178,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul",
+   "cls": "off-by-one",
+   "count": 10,
+   "seeds": [
+    450,
+    21285,
+    71728,
+    80030,
+    85632
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      1,
+      3
+     ],
+     "got": -8,
+     "want": -9,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,extended|Conv|uint8|extreme-scale|dq_conv_q",
+   "cls": "off-by-one",
+   "count": 9,
+   "seeds": [
+    3780,
+    12299,
+    14443,
+    44940,
+    77680
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 42,
+    "n_inexact": 42,
+    "example": {
+     "index": [
+      0,
+      3,
+      0,
+      4
+     ],
+     "got": 161,
+     "want": 162,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "off-by-one|all,extended|Relu|uint8|extreme-scale|dq_conv_q",
+   "cls": "off-by-one",
+   "count": 1,
+   "seeds": [
+    91996
+   ],
+   "example": {
+    "regime": "extreme-scale",
+    "output": "t16",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      1,
+      0,
+      2,
+      0
+     ],
+     "got": 114,
+     "want": 113,
+     "slack": 0
+    }
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|ConvInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running ConvInteger node.  Status Message: onnxrunti",
+   "cls": "rejects-valid-model",
+   "count": 1329,
+   "seeds": [
+    66,
+    139,
+    204,
+    364,
+    550
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now"
+    },
+    "stage": "run"
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(N) node with name 'nN_QLin",
+   "cls": "rejects-valid-model",
+   "count": 1146,
+   "seeds": [
+    162,
+    341,
+    342,
+    615,
+    741
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'",
+     "extended": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'",
+     "all": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'"
+    },
+    "stage": "load"
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|QLinearConv|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(N) node with name 'nN_QLinea",
+   "cls": "rejects-valid-model",
+   "count": 882,
+   "seeds": [
+    124,
+    254,
+    566,
+    589,
+    689
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'",
+     "extended": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'",
+     "all": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'"
+    },
+    "stage": "load"
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QLinearMatMul node.  Status Message: onnxrun",
+   "cls": "rejects-valid-model",
+   "count": 422,
+   "seeds": [
+    144,
+    708,
+    719,
+    777,
+    1134
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus"
+    },
+    "stage": "run"
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|MatMulInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running MatMulInteger node.  Status Message: onnxrun",
+   "cls": "rejects-valid-model",
+   "count": 265,
+   "seeds": [
+    446,
+    597,
+    622,
+    1342,
+    1442
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b"
+    },
+    "stage": "run"
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|QuantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru",
+   "cls": "rejects-valid-model",
+   "count": 191,
+   "seeds": [
+    289,
+    588,
+    694,
+    1033,
+    1140
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens"
+    },
+    "stage": "run"
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|DequantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running DequantizeLinear node.  Status Message: onnx",
+   "cls": "rejects-valid-model",
+   "count": 161,
+   "seeds": [
+    2691,
+    3059,
+    4199,
+    5089,
+    5296
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running DequantizeLinear node. Name:'n0_DequantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running DequantizeLinear node. Name:'n0_DequantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running DequantizeLinear node. Name:'n0_DequantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-"
+    },
+    "stage": "run"
+   }
+  },
+  {
+   "signature": "rejects-valid-model|all,disable,extended|DequantizeLinear+QuantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru",
+   "cls": "rejects-valid-model",
+   "count": 96,
+   "seeds": [
+    235,
+    1113,
+    4618,
+    5293,
+    11451
+   ],
+   "example": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens"
+    },
+    "stage": "run"
+   }
+  }
+ ],
+ "findings": [
+  {
+   "id": "nan-quantizelinear-dequantizelinear-4686bf",
+   "cls": "nan-inf",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "nan-inf|all,disable,extended|QuantizeLinear>DequantizeLinear|float32|normal|quantize",
+   "raw_signatures": [
+    "nan-inf|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|normal|quantize"
+   ],
+   "hits": 300,
+   "seed": 7,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": Infinity,
+    "max_diff": 0.0,
+    "n_bad": 1,
+    "n_inexact": 0,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": -448,
+     "want": "nan",
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 1, 1, 1] = [-0.0399999991]\nconst c2: float32[] = [8.19999987e-05]\nconst c3: float8e4m3fn[] = [0]\nconst obs_s5: float32[] = [1]\nconst obs_z6: float8e4m3fn[] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'saturate': 0}\nt7 = DequantizeLinear(t4, obs_s5, obs_z6)\noutputs: t7"
+  },
+  {
+   "id": "nan-quantizelinear-dequantizelinear-55b8e3",
+   "cls": "nan-inf",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "nan-inf|all,disable,extended|QuantizeLinear>DequantizeLinear|float32|extreme-scale|quantize",
+   "raw_signatures": [
+    "nan-inf|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|quantize"
+   ],
+   "hits": 193,
+   "seed": 1335,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": Infinity,
+    "max_diff": 0.0,
+    "n_bad": 1,
+    "n_inexact": 0,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": 448,
+     "want": "nan",
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 1, 1] = [1.80000005e+22]\nconst c2: float32[] = [3.7e+19]\nconst c3: float8e4m3fn[] = [0]\nconst obs_s5: float32[] = [1]\nconst obs_z6: float8e4m3fn[] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'saturate': 0}\nt7 = DequantizeLinear(t4, obs_s5, obs_z6)\noutputs: t7"
+  },
+  {
+   "id": "nan-matmul-347847",
+   "cls": "nan-inf",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "nan-inf|all,extended|DequantizeLinear>MatMul|float32|extreme-scale|dq_matmul_nbits",
+   "raw_signatures": [
+    "nan-inf|all,extended|MatMul|float32|extreme-scale|dq_matmul_nbits"
+   ],
+   "hits": 25,
+   "seed": 2150,
+   "ops": [
+    "DequantizeLinear",
+    "MatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "MatMul"
+    ],
+    "extended": [
+     "com.microsoft.MatMulNBits"
+    ],
+    "all": [
+     "com.microsoft.MatMulNBits"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t6",
+    "level": "extended",
+    "max_excess": Infinity,
+    "max_diff": 0.0,
+    "n_bad": 1,
+    "n_inexact": 0,
+    "example": {
+     "index": [
+      0,
+      9
+     ],
+     "got": "-inf",
+     "want": "nan",
+     "slack": 0
+    }
+   },
+   "description": "input a5: float32[1, 64] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst w1: uint4[64, 32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[4, 32] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ...]\nconst c3: uint4[4, 32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nt4 = DequantizeLinear(w1, c2, c3) {'axis': 0, 'block_size': 16}\nt6 = MatMul(a5, t4)\noutputs: t6"
+  },
+  {
+   "id": "nan-quantizelinear-dequantizelinear-quantize-fea0cb",
+   "cls": "nan-inf",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "nan-inf|all,extended|QuantizeLinear>DequantizeLinear>QuantizeLinear>DequantizeLinear|float32|extreme-scale|qdq",
+   "raw_signatures": [
+    "nan-inf|all,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|qdq"
+   ],
+   "hits": 1,
+   "seed": 40813,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear",
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "extended",
+    "max_excess": Infinity,
+    "max_diff": 0.0,
+    "n_bad": 1,
+    "n_inexact": 0,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": "nan",
+     "want": 0,
+     "slack": 1.401298464324817e-45
+    }
+   },
+   "description": "input x1: float32[1, 1, 1, 1] = [0]\nconst c2: float32[] = [3.00000012e+34]\nconst c3: uint16[] = [0]\nconst c6: float32[] = [1.99999996e+34]\nconst c7: uint16[] = [0]\nt4 = QuantizeLinear(x1, c2, c3)\nt5 = DequantizeLinear(t4, c2, c3)\nt8 = QuantizeLinear(t5, c6, c7)\nt9 = DequantizeLinear(t8, c6, c7)\noutputs: t9"
+  },
+  {
+   "id": "mm-matmul-f7b7d9",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>MatMul|float32|normal|dq_matmul_nbits",
+   "raw_signatures": [
+    "mismatch|all,extended|MatMul|float32|normal|dq_matmul_nbits"
+   ],
+   "hits": 5198,
+   "seed": 44,
+   "ops": [
+    "DequantizeLinear",
+    "MatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "MatMul"
+    ],
+    "extended": [
+     "com.microsoft.MatMulNBits"
+    ],
+    "all": [
+     "com.microsoft.MatMulNBits"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t6",
+    "level": "extended",
+    "max_excess": 0.006289386749237735,
+    "max_diff": 0.006299257278442383,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": -2.3937008380889893,
+     "want": -2.4000000953674316,
+     "slack": 9.870529204647482e-06
+    }
+   },
+   "description": "input a5: float32[1, 64] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst w1: uint4[64, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[2, 1] = [1, 1]\nconst c3: uint4[2, 1] = [0, 4]\nt4 = DequantizeLinear(w1, c2, c3) {'axis': 0, 'block_size': 32}\nt6 = MatMul(a5, t4)\noutputs: t6"
+  },
+  {
+   "id": "mm-matmul-e6c919",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>MatMul|float32|extreme-scale|dq_matmul_nbits",
+   "raw_signatures": [
+    "mismatch|all,extended|MatMul|float32|extreme-scale|dq_matmul_nbits"
+   ],
+   "hits": 965,
+   "seed": 43,
+   "ops": [
+    "DequantizeLinear",
+    "MatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "MatMul"
+    ],
+    "extended": [
+     "com.microsoft.MatMulNBits"
+    ],
+    "all": [
+     "com.microsoft.MatMulNBits"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t6",
+    "level": "extended",
+    "max_excess": 0.007044798134092645,
+    "max_diff": 0.007086694240570068,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      4
+     ],
+     "got": 0.8929133415222168,
+     "want": 0.9000000357627869,
+     "slack": 4.18961064774237e-05
+    }
+   },
+   "description": "input a5: float32[1, 256] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst w1: uint4[256, 5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[4, 5] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.00000002e-32 ...]\nconst c3: uint4[4, 5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nt4 = DequantizeLinear(w1, c2, c3) {'axis': 0, 'block_size': 64}\nt6 = MatMul(a5, t4)\noutputs: t6"
+  },
+  {
+   "id": "mm-quantizelinear-dequantizelinear-quantize-ce328a",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|QuantizeLinear>DequantizeLinear>QuantizeLinear>DequantizeLinear|float32|normal|qdq",
+   "raw_signatures": [
+    "mismatch|all,extended|DequantizeLinear+QuantizeLinear|float32|normal|qdq"
+   ],
+   "hits": 435,
+   "seed": 413,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear",
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t9",
+    "level": "extended",
+    "max_excess": 0.4959994554519257,
+    "max_diff": 0.4960002899169922,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": -6.504000186920166,
+     "want": -7.000000476837158,
+     "slack": 8.344650664904307e-07
+    }
+   },
+   "description": "input x1: float32[1, 1, 1, 1] = [-6.50436926]\nconst c2: float32[] = [1]\nconst c3: int16[] = [0]\nconst c6: float32[] = [0.00100000005]\nconst c7: int16[] = [0]\nt4 = QuantizeLinear(x1, c2, c3)\nt5 = DequantizeLinear(t4, c2, c3)\nt8 = QuantizeLinear(t5, c6, c7)\nt9 = DequantizeLinear(t8, c6, c7)\noutputs: t9"
+  },
+  {
+   "id": "mm-quantizelinear-dequantizelinear-6963b7",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear>DequantizeLinear|float32|extreme-scale|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|quantize"
+   ],
+   "hits": 140,
+   "seed": 1214,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": 14.999999165534973,
+    "max_diff": 15.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": -8,
+     "want": 7,
+     "slack": 8.344650268554688e-07
+    }
+   },
+   "description": "input x1: float32[1, 1, 1] = [inf]\nconst c2: float32[1, 1, 1] = [7.99999995e+37]\nconst c3: int4[1, 1, 1] = [0]\nconst obs_s5: float32[] = [1]\nconst obs_z6: int4[] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 2}\nt7 = DequantizeLinear(t4, obs_s5, obs_z6)\noutputs: t7"
+  },
+  {
+   "id": "mm-relu-f5f010",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|QuantizeLinear>DequantizeLinear>QuantizeLinear>DequantizeLinear>Relu|float32|normal|qdq",
+   "raw_signatures": [
+    "mismatch|all,extended|Relu|float32|normal|qdq"
+   ],
+   "hits": 133,
+   "seed": 2131,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear",
+    "QuantizeLinear",
+    "DequantizeLinear",
+    "Relu"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "Relu"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "Relu"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "Relu"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t10",
+    "level": "extended",
+    "max_excess": 0.18566656112670898,
+    "max_diff": 0.1953125,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 19999.8046875,
+     "want": 20000,
+     "slack": 0.009645938873291016
+    }
+   },
+   "description": "input x1: float32[1, 1, 1, 1] = [20000]\nconst c2: float32[] = [1]\nconst c3: uint16[] = [0]\nconst c6: float32[] = [1]\nconst c7: uint16[] = [30458]\nt4 = QuantizeLinear(x1, c2, c3)\nt5 = DequantizeLinear(t4, c2, c3)\nt8 = QuantizeLinear(t5, c6, c7)\nt9 = DequantizeLinear(t8, c6, c7)\nt10 = Relu(t9)\noutputs: t10"
+  },
+  {
+   "id": "mm-qlinearmatmul-2baa28",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QLinearMatMul|uint8|extreme-scale|qlinear_matmul",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QLinearMatMul|uint8|extreme-scale|qlinear_matmul"
+   ],
+   "hits": 132,
+   "seed": 544,
+   "ops": [
+    "QLinearMatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearMatMul"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 2.0,
+    "max_diff": 2.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": 168,
+     "want": 166,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1, 1, 1] = [108]\nconst c2: float32[] = [0.00079999998]\nconst c3: uint8[] = [128]\nconst w4: uint8[1, 1] = [255]\nconst c5: float32[1] = [1.99993317e-41]\nconst c6: uint8[1] = [242]\nconst c7: float32[] = [6.0255834e-44]\nconst c8: uint8[] = [235]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "mm-mul-6eee63",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>Mul>QuantizeLinear|int8|extreme-scale|dq_binary_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Mul|int8|extreme-scale|dq_binary_q"
+   ],
+   "hits": 128,
+   "seed": 1161,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Mul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Mul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1] = [107]\ninput b5: int8[1] = [0]\nconst c2: float32[] = [1]\nconst c3: int8[] = [0]\nconst c6: float32[] = [2.99999998e+25]\nconst c7: int8[] = [-128]\nconst c10: float32[] = [1]\nconst c11: int8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Mul(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-mul-302968",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>Mul>QuantizeLinear|uint8|extreme-scale|dq_binary_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Mul|uint8|extreme-scale|dq_binary_q"
+   ],
+   "hits": 122,
+   "seed": 581,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Mul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Mul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1] = [153]\ninput b5: uint8[1] = [150]\nconst c2: float32[] = [4.00000008e+20]\nconst c3: uint8[] = [0]\nconst c6: float32[] = [1]\nconst c7: uint8[] = [0]\nconst c10: float32[] = [1]\nconst c11: uint8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Mul(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-qlinearconv-32c8d6",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QLinearConv|uint8|extreme-scale|qlinear_conv",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QLinearConv|uint8|extreme-scale|qlinear_conv"
+   ],
+   "hits": 114,
+   "seed": 1940,
+   "ops": [
+    "QLinearConv"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearConv"
+    ],
+    "extended": [
+     "QLinearConv"
+    ],
+    "all": [
+     "Transpose",
+     "com.microsoft.QLinearConv",
+     "Transpose"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "disable",
+    "max_excess": 3.0,
+    "max_diff": 3.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 237,
+     "want": 234,
+     "slack": 0
+    }
+   },
+   "description": "input x1: uint8[1, 2, 1, 2] = [255, 0, 57, 0]\nconst c2: float32[] = [4.7499814e-41]\nconst c3: uint8[] = [128]\nconst w4: int8[1, 2, 1, 2] = [-112, -127, -51, 56]\nconst c5: float32[1] = [0.000899999985]\nconst c6: int8[1] = [0]\nconst c7: float32[] = [7.00649232e-44]\nconst c8: uint8[] = [0]\nconst c9: int32[1] = [1898]\nt10 = QLinearConv(x1, c2, c3, w4, c5, c6, c7, c8, c9) {'kernel_shape': [1, 2]}\noutputs: t10"
+  },
+  {
+   "id": "mm-add-d14801",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>Add>QuantizeLinear|int8|extreme-scale|dq_binary_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Add|int8|extreme-scale|dq_binary_q"
+   ],
+   "hits": 113,
+   "seed": 96,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Add",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Add",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearAdd"
+    ],
+    "all": [
+     "com.microsoft.QLinearAdd"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1] = [110]\ninput b5: int8[1] = [0]\nconst c2: float32[] = [8.00000033e+35]\nconst c3: int8[] = [0]\nconst c6: float32[] = [1]\nconst c7: int8[] = [0]\nconst c10: float32[] = [1]\nconst c11: int8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Add(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-add-0d23de",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>Add>QuantizeLinear|uint8|extreme-scale|dq_binary_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Add|uint8|extreme-scale|dq_binary_q"
+   ],
+   "hits": 93,
+   "seed": 40,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Add",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Add",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearAdd"
+    ],
+    "all": [
+     "com.microsoft.QLinearAdd"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1] = [198]\ninput b5: uint8[1] = [0]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [0]\nconst c6: float32[] = [1]\nconst c7: uint8[] = [0]\nconst c10: float32[] = [2.99999784e-40]\nconst c11: uint8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Add(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-qlinearmatmul-19218d",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul"
+   ],
+   "hits": 73,
+   "seed": 493,
+   "ops": [
+    "QLinearMatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearMatMul"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 127.0,
+    "max_diff": 127.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 127,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1, 1] = [0]\nconst c2: float32[] = [0.00899999961]\nconst c3: int8[] = [104]\nconst w4: int8[1, 1] = [0]\nconst c5: float32[1] = [2.94272678e-44]\nconst c6: int8[1] = [81]\nconst c7: float32[] = [7.00649232e-45]\nconst c8: int8[] = [0]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "mm-qlinearmul-408803",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QLinearMul|int8|extreme-scale|qlinear_binary",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QLinearMul|int8|extreme-scale|qlinear_binary"
+   ],
+   "hits": 68,
+   "seed": 1164,
+   "ops": [
+    "QLinearMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "com.microsoft.QLinearMul"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1, 1, 1] = [0]\ninput b4: int8[1, 1, 1] = [127]\nconst c2: float32[] = [1]\nconst c3: int8[] = [-127]\nconst c5: float32[] = [4.99999978e+24]\nconst c6: int8[] = [0]\nconst c7: float32[] = [1]\nconst c8: int8[] = [0]\nt9 = com.microsoft.QLinearMul(a1, c2, c3, b4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "mm-quantizelinear-dequantizelinear-quantize-ef0593",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|QuantizeLinear>DequantizeLinear>QuantizeLinear>DequantizeLinear|float32|extreme-scale|qdq",
+   "raw_signatures": [
+    "mismatch|all,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|qdq"
+   ],
+   "hits": 67,
+   "seed": 1448,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear",
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "extended",
+    "max_excess": 8.960000118690813e-30,
+    "max_diff": 8.960000118690815e-30,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": -8.960000118690815e-30,
+     "want": 0,
+     "slack": 1.401298464324817e-45
+    }
+   },
+   "description": "input x1: float32[1, 1, 1, 1] = [-1.70000005]\nconst c2: float32[] = [4]\nconst c3: int8[] = [0]\nconst c6: float32[] = [7.00000009e-32]\nconst c7: int8[] = [0]\nt4 = QuantizeLinear(x1, c2, c3)\nt5 = DequantizeLinear(t4, c2, c3)\nt8 = QuantizeLinear(t5, c6, c7)\nt9 = DequantizeLinear(t8, c6, c7)\noutputs: t9"
+  },
+  {
+   "id": "mm-quantizelinear-f7b541",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|uint16|extreme-scale|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|uint16|extreme-scale|quantize"
+   ],
+   "hits": 64,
+   "seed": 2427,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      1,
+      1,
+      0
+     ],
+     "got": 0,
+     "want": 65535,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 2, 2, 1] = [0, 0, 0, inf]\nconst c2: float32[1, 1, 2, 1] = [1, 6.00000021e+37]\nconst c3: uint16[1, 1, 2, 1] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 1, 'block_size': 3}\noutputs: t4"
+  },
+  {
+   "id": "mm-qlinearmul-c80736",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary"
+   ],
+   "hits": 62,
+   "seed": 5134,
+   "ops": [
+    "QLinearMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "com.microsoft.QLinearMul"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 2.0,
+    "max_diff": 2.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 11,
+     "want": 9,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1, 1] = [63]\ninput b4: uint8[1, 1] = [169]\nconst c2: float32[] = [0.0046000001]\nconst c3: uint8[] = [208]\nconst c5: float32[] = [1.19993188e-41]\nconst c6: uint8[] = [0]\nconst c7: float32[] = [1.1399563e-41]\nconst c8: uint8[] = [128]\nt9 = com.microsoft.QLinearMul(a1, c2, c3, b4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "mm-quantizelinear-dequantizelinear-c2024e",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear>DequantizeLinear|float32|normal|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|normal|quantize"
+   ],
+   "hits": 60,
+   "seed": 2745,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t7",
+    "level": "disable",
+    "max_excess": 14.999999046325684,
+    "max_diff": 15.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 7,
+     "want": -8,
+     "slack": 9.5367431640625e-07
+    }
+   },
+   "description": "input x1: float32[1, 1, 1, 1] = [-3.00000001e+38]\nconst c2: float32[1, 1, 1, 1] = [1]\nconst c3: int4[1, 1, 1, 1] = [-7]\nconst obs_s5: float32[] = [1]\nconst obs_z6: int4[] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 2, 'block_size': 3}\nt7 = DequantizeLinear(t4, obs_s5, obs_z6)\noutputs: t7"
+  },
+  {
+   "id": "mm-quantizelinear-1c3dbc",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|int16|extreme-scale|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|int16|extreme-scale|quantize"
+   ],
+   "hits": 53,
+   "seed": 506,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      1,
+      0
+     ],
+     "got": -32768,
+     "want": 32767,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 1, 2, 1] = [0, inf]\nconst c2: float32[1, 1, 2, 1] = [1, 1.99999999e+37]\nconst c3: int16[1, 1, 2, 1] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 4}\noutputs: t4"
+  },
+  {
+   "id": "mm-quantizelinear-162487",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|uint8|extreme-scale|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|uint8|extreme-scale|quantize"
+   ],
+   "hits": 51,
+   "seed": 7939,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      6,
+      1,
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 7, 2, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[1, 1, 2, 1] = [1, 3.00000004e+36]\nconst c3: uint8[1, 1, 2, 1] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 1, 'block_size': 16}\noutputs: t4"
+  },
+  {
+   "id": "mm-qlinearconv-dab856",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QLinearConv|int8|extreme-scale|qlinear_conv",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QLinearConv|int8|extreme-scale|qlinear_conv"
+   ],
+   "hits": 41,
+   "seed": 9072,
+   "ops": [
+    "QLinearConv"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearConv"
+    ],
+    "extended": [
+     "QLinearConv"
+    ],
+    "all": [
+     "Transpose",
+     "com.microsoft.QLinearConv",
+     "Transpose"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 128.0,
+    "max_diff": 128.0,
+    "n_bad": 64,
+    "n_inexact": 64,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": -128,
+     "want": 0,
+     "slack": 0
+    }
+   },
+   "description": "input x1: int8[1, 64, 3, 2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[] = [1]\nconst c3: int8[] = [0]\nconst w4: int8[64, 16, 2, 2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c5: float32[64] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ...]\nconst c6: int8[64] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c7: float32[] = [5.60519386e-45]\nconst c8: int8[] = [0]\nt9 = QLinearConv(x1, c2, c3, w4, c5, c6, c7, c8) {'kernel_shape': [2, 2], 'strides': [3, 1], 'dilations': [2, 1], 'group': 4}\noutputs: t9"
+  },
+  {
+   "id": "mm-matmul-ef058a",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>MatMul>QuantizeLinear|uint8|extreme-scale|dq_matmul_q",
+   "raw_signatures": [
+    "mismatch|all,extended|MatMul|uint8|extreme-scale|dq_matmul_q"
+   ],
+   "hits": 40,
+   "seed": 564,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "MatMul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "MatMul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1, 1] = [0]\nconst w2: int8[1, 1] = [0]\nconst c3: float32[] = [0.00800000038]\nconst c4: uint8[] = [238]\nconst c6: float32[] = [7.00649232e-45]\nconst c7: int8[] = [94]\nconst c10: float32[] = [1.40129846e-45]\nconst c11: uint8[] = [0]\nt5 = DequantizeLinear(a1, c3, c4)\nt8 = DequantizeLinear(w2, c6, c7)\nt9 = MatMul(t5, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-conv-5acfa0",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>DequantizeLinear>Conv>QuantizeLinear|uint8|extreme-scale|dq_conv_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Conv|uint8|extreme-scale|dq_conv_q"
+   ],
+   "hits": 35,
+   "seed": 101,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Conv",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Conv",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QLinearConv"
+    ],
+    "all": [
+     "Transpose",
+     "com.microsoft.QLinearConv",
+     "Transpose"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t15",
+    "level": "extended",
+    "max_excess": 248.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      31,
+      0,
+      0
+     ],
+     "got": 255,
+     "want": 0,
+     "slack": 7
+    }
+   },
+   "description": "input x1: uint8[1, 32, 1, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [0]\nconst w5: uint8[32, 1, 1, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c6: float32[] = [7.00649232e-43]\nconst c7: uint8[] = [0]\nconst c9: int32[32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c10: float32[] = [0]\nconst c13: float32[] = [1.40129846e-45]\nconst c14: uint8[] = [0]\nt4 = DequantizeLinear(x1, c2, c3)\nt8 = DequantizeLinear(w5, c6, c7)\nt11 = DequantizeLinear(c9, c10)\nt12 = Conv(t4, t8, t11) {'kernel_shape': [1, 1], 'group': 32}\nt15 = QuantizeLinear(t12, c13, c14)\noutputs: t15"
+  },
+  {
+   "id": "mm-quantizelinear-cb55fa",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|int8|extreme-scale|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|int8|extreme-scale|quantize"
+   ],
+   "hits": 32,
+   "seed": 7628,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      2,
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 1, 3, 2] = [0, 0, 0, 0, inf, 0]\nconst c2: float32[1, 1, 1, 2] = [1.99999999e+37, 1]\nconst c3: int8[1, 1, 1, 2] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 2, 'block_size': 16}\noutputs: t4"
+  },
+  {
+   "id": "mm-relu-f35585",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|QuantizeLinear>DequantizeLinear>QuantizeLinear>DequantizeLinear>Relu|float32|extreme-scale|qdq",
+   "raw_signatures": [
+    "mismatch|all,extended|Relu|float32|extreme-scale|qdq"
+   ],
+   "hits": 17,
+   "seed": 12305,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear",
+    "QuantizeLinear",
+    "DequantizeLinear",
+    "Relu"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "Relu"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "Relu"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear",
+     "Relu"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "extended",
+    "max_excess": 9.999245451882597e-41,
+    "max_diff": 9.99938558172903e-41,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 9.99938558172903e-41,
+     "want": 0,
+     "slack": 1.401298464324817e-45
+    }
+   },
+   "description": "input x1: float32[1, 1, 1, 1] = [9.9999461e-41]\nconst c2: float32[] = [1.96181785e-44]\nconst c3: int16[] = [0]\nconst c6: float32[] = [1]\nconst c7: int16[] = [0]\nt4 = QuantizeLinear(x1, c2, c3)\nt5 = DequantizeLinear(t4, c2, c3)\nt8 = QuantizeLinear(t5, c6, c7)\nt9 = DequantizeLinear(t8, c6, c7)\nt10 = Relu(t9)\noutputs: t10"
+  },
+  {
+   "id": "mm-quantizelinear-b7b255",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|int8|normal|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|int8|normal|quantize"
+   ],
+   "hits": 12,
+   "seed": 24342,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      4,
+      0,
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[8, 2, 1] = [0, 0, 0, 0, 0, 0, 0, 0, inf, 0, 0, 0 ...]\nconst c2: float32[1, 2, 1] = [1, 1]\nconst c3: int8[1, 2, 1] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 8}\noutputs: t4"
+  },
+  {
+   "id": "mm-quantizelinear-36bc7e",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|uint16|normal|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|uint16|normal|quantize"
+   ],
+   "hits": 9,
+   "seed": 6799,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      1
+     ],
+     "got": 0,
+     "want": 65535,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 1, 2] = [0, 3.00000001e+38]\nconst c2: float32[1, 1, 2] = [1, 1]\nconst c3: uint16[1, 1, 2] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 1, 'block_size': 1}\noutputs: t4"
+  },
+  {
+   "id": "mm-quantizelinear-0e4b8c",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|int16|normal|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|int16|normal|quantize"
+   ],
+   "hits": 7,
+   "seed": 1908,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 65535.0,
+    "max_diff": 65535.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": -32768,
+     "want": 32767,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 2, 2] = [3.00000001e+38, 0, 0, 0]\nconst c2: float32[1, 1, 2] = [1, 1]\nconst c3: int16[1, 1, 2] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 1, 'block_size': 2}\noutputs: t4"
+  },
+  {
+   "id": "mm-quantizelinear-744260",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,disable,extended|QuantizeLinear|uint8|normal|quantize",
+   "raw_signatures": [
+    "mismatch|all,disable,extended|QuantizeLinear|uint8|normal|quantize"
+   ],
+   "hits": 6,
+   "seed": 8636,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t4",
+    "level": "disable",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   },
+   "description": "input x1: float32[1, 2, 2, 1] = [3.00000001e+38, 0, 0, 0]\nconst c2: float32[1, 1, 2, 1] = [1, 1]\nconst c3: uint8[1, 1, 2, 1] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 1, 'block_size': 2}\noutputs: t4"
+  },
+  {
+   "id": "mm-mul-0a9a3d",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>Mul>QuantizeLinear|uint8|normal|dq_binary_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Mul|uint8|normal|dq_binary_q"
+   ],
+   "hits": 4,
+   "seed": 12937,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Mul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Mul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1, 1] = [0]\ninput b5: uint8[1, 1] = [0]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [81]\nconst c6: float32[] = [3000]\nconst c7: uint8[] = [251]\nconst c10: float32[] = [5.99999985e-05]\nconst c11: uint8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Mul(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-mul-670d5f",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>Mul>QuantizeLinear|int8|normal|dq_binary_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Mul|int8|normal|dq_binary_q"
+   ],
+   "hits": 3,
+   "seed": 2735,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Mul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Mul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": -128,
+     "want": 127,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1, 1, 1] = [0]\ninput b5: int8[] = [0]\nconst c2: float32[] = [5000]\nconst c3: int8[] = [68]\nconst c6: float32[] = [200]\nconst c7: int8[] = [94]\nconst c10: float32[] = [1]\nconst c11: int8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Mul(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-add-c06392",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>Add>QuantizeLinear|uint8|normal|dq_binary_q",
+   "raw_signatures": [
+    "mismatch|all,extended|Add|uint8|normal|dq_binary_q"
+   ],
+   "hits": 1,
+   "seed": 2518,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Add",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Add",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearAdd"
+    ],
+    "all": [
+     "com.microsoft.QLinearAdd"
+    ]
+   },
+   "detail": {
+    "regime": "normal",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 255.0,
+    "max_diff": 255.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 255,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1, 1, 1] = [229]\ninput b5: uint8[1] = [0]\nconst c2: float32[] = [3000]\nconst c3: uint8[] = [0]\nconst c6: float32[] = [1]\nconst c7: uint8[] = [0]\nconst c10: float32[] = [9.99999975e-05]\nconst c11: uint8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Add(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "mm-matmul-6a9f21",
+   "cls": "mismatch",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "mismatch|all,extended|DequantizeLinear>DequantizeLinear>MatMul>QuantizeLinear|uint8|extreme-scale|chain",
+   "raw_signatures": [
+    "mismatch|all,extended|MatMul|uint8|extreme-scale|chain"
+   ],
+   "hits": 1,
+   "seed": 58069,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "MatMul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "MatMul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t23",
+    "level": "extended",
+    "max_excess": 114.0,
+    "max_diff": 114.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 114,
+     "slack": 0
+    }
+   },
+   "description": "input t12: uint8[1, 1] = [0]\nconst c13: float32[] = [1]\nconst c14: uint8[] = [0]\nconst c16: uint8[1, 1] = [0]\nconst c17: float32[] = [1]\nconst c18: uint8[] = [0]\nconst c21: float32[] = [9.99966584e-42]\nconst c22: uint8[] = [114]\nt15 = DequantizeLinear(t12, c13, c14)\nt19 = DequantizeLinear(c16, c17, c18)\nt20 = MatMul(t15, t19)\nt23 = QuantizeLinear(t20, c21, c22)\noutputs: t23"
+  },
+  {
+   "id": "obo-mul-0602d8",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>Mul>QuantizeLinear|uint8|extreme-scale|dq_binary_q",
+   "raw_signatures": [
+    "off-by-one|all,extended|Mul|uint8|extreme-scale|dq_binary_q"
+   ],
+   "hits": 56,
+   "seed": 1043,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Mul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Mul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": 64,
+     "want": 63,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1] = [184]\ninput b5: uint8[1] = [118]\nconst c2: float32[] = [3.86310863]\nconst c3: uint8[] = [160]\nconst c6: float32[] = [2.0949412e-42]\nconst c7: uint8[] = [226]\nconst c10: float32[] = [5.17919912e-40]\nconst c11: uint8[] = [104]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Mul(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "obo-mul-61f545",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>Mul>QuantizeLinear|int8|extreme-scale|dq_binary_q",
+   "raw_signatures": [
+    "off-by-one|all,extended|Mul|int8|extreme-scale|dq_binary_q"
+   ],
+   "hits": 45,
+   "seed": 1071,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Mul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Mul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 92,
+     "want": 93,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1, 1] = [61]\ninput b5: int8[1, 1] = [-30]\nconst c2: float32[] = [6.68000379e-40]\nconst c3: int8[] = [0]\nconst c6: float32[] = [0.000243999995]\nconst c7: int8[] = [-127]\nconst c10: float32[] = [1.04004372e-41]\nconst c11: int8[] = [0]\nt4 = DequantizeLinear(a1, c2, c3)\nt8 = DequantizeLinear(b5, c6, c7)\nt9 = Mul(t4, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "obo-qlinearmul-634349",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary",
+   "raw_signatures": [
+    "off-by-one|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary"
+   ],
+   "hits": 42,
+   "seed": 4373,
+   "ops": [
+    "QLinearMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "com.microsoft.QLinearMul"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0
+     ],
+     "got": 125,
+     "want": 124,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1] = [255]\ninput b4: uint8[1] = [245]\nconst c2: float32[] = [9.99966584e-42]\nconst c3: uint8[] = [1]\nconst c5: float32[] = [0.00600000005]\nconst c6: uint8[] = [0]\nconst c7: float32[] = [3.00003988e-41]\nconst c8: uint8[] = [0]\nt9 = com.microsoft.QLinearMul(a1, c2, c3, b4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "obo-qlinearmul-b4fab1",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,disable,extended|QLinearMul|int8|extreme-scale|qlinear_binary",
+   "raw_signatures": [
+    "off-by-one|all,disable,extended|QLinearMul|int8|extreme-scale|qlinear_binary"
+   ],
+   "hits": 39,
+   "seed": 4346,
+   "ops": [
+    "QLinearMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "com.microsoft.QLinearMul"
+    ],
+    "extended": [
+     "com.microsoft.QLinearMul"
+    ],
+    "all": [
+     "com.microsoft.QLinearMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0
+     ],
+     "got": -39,
+     "want": -40,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1, 1, 1] = [0]\nconst c2: float32[] = [2.99999784e-40]\nconst c3: int8[] = [103]\nconst c4: int8[1] = [0]\nconst c5: float32[] = [9.99999975e-05]\nconst c6: int8[] = [-128]\nconst c7: float32[] = [9.99966584e-42]\nconst c8: int8[] = [0]\nt9 = com.microsoft.QLinearMul(a1, c2, c3, c4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "obo-qlinearmatmul-31f3be",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,disable,extended|QLinearMatMul|uint8|extreme-scale|qlinear_matmul",
+   "raw_signatures": [
+    "off-by-one|all,disable,extended|QLinearMatMul|uint8|extreme-scale|qlinear_matmul"
+   ],
+   "hits": 36,
+   "seed": 8223,
+   "ops": [
+    "QLinearMatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearMatMul"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 0,
+     "want": 1,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1, 1] = [0]\ninput b4: uint8[1, 1] = [0]\nconst c2: float32[] = [3.0000001e+19]\nconst c3: uint8[] = [0]\nconst c5: float32[1] = [7.0000002e+28]\nconst c6: uint8[1] = [0]\nconst c7: float32[] = [1]\nconst c8: uint8[] = [1]\nt9 = QLinearMatMul(a1, c2, c3, b4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "obo-qlinearconv-6c81e2",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,disable,extended|QLinearConv|uint8|extreme-scale|qlinear_conv",
+   "raw_signatures": [
+    "off-by-one|all,disable,extended|QLinearConv|uint8|extreme-scale|qlinear_conv"
+   ],
+   "hits": 31,
+   "seed": 4211,
+   "ops": [
+    "QLinearConv"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearConv"
+    ],
+    "extended": [
+     "QLinearConv"
+    ],
+    "all": [
+     "Transpose",
+     "com.microsoft.QLinearConv",
+     "Transpose"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      1,
+      0
+     ],
+     "got": 45,
+     "want": 46,
+     "slack": 0
+    }
+   },
+   "description": "input x1: uint8[1, 32, 1] = [144, 155, 142, 193, 177, 197, 0, 24, 1, 151, 19, 13 ...]\nconst c2: float32[] = [8.99633614e-43]\nconst c3: uint8[] = [128]\nconst w4: uint8[8, 16, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c5: float32[8] = [1, 0.140000001, 1, 1, 1, 1, 1, 1]\nconst c6: uint8[8] = [0, 234, 0, 0, 0, 0, 0, 0]\nconst c7: float32[] = [9.96323208e-43]\nconst c8: uint8[] = [139]\nconst c9: int32[8] = [0, 4192, 0, 0, 0, 0, 0, 0]\nt10 = QLinearConv(x1, c2, c3, w4, c5, c6, c7, c8, c9) {'kernel_shape': [1], 'strides': [2], 'group': 2}\noutputs: t10"
+  },
+  {
+   "id": "obo-qlinearconv-a5e2a9",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,disable,extended|QLinearConv|int8|extreme-scale|qlinear_conv",
+   "raw_signatures": [
+    "off-by-one|all,disable,extended|QLinearConv|int8|extreme-scale|qlinear_conv"
+   ],
+   "hits": 15,
+   "seed": 7798,
+   "ops": [
+    "QLinearConv"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearConv"
+    ],
+    "extended": [
+     "QLinearConv"
+    ],
+    "all": [
+     "Transpose",
+     "com.microsoft.QLinearConv",
+     "Transpose"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t10",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      18,
+      0,
+      0
+     ],
+     "got": -19,
+     "want": -20,
+     "slack": 0
+    }
+   },
+   "description": "input x1: int8[1, 32, 1, 9] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[] = [0.00173000002]\nconst c3: int8[] = [0]\nconst w4: int8[32, 1, 2, 5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c5: float32[] = [1.95999616e-41]\nconst c6: int8[] = [0]\nconst c7: float32[] = [1.89175293e-43]\nconst c8: int8[] = [0]\nconst c9: int32[32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nt10 = QLinearConv(x1, c2, c3, w4, c5, c6, c7, c8, c9) {'kernel_shape': [2, 5], 'strides': [2, 3], 'dilations': [1, 2], 'pads': [1, 0, 1, 0], 'group': 32}\noutputs: t10"
+  },
+  {
+   "id": "obo-matmul-7b6d61",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>MatMul>QuantizeLinear|uint8|extreme-scale|dq_matmul_q",
+   "raw_signatures": [
+    "off-by-one|all,extended|MatMul|uint8|extreme-scale|dq_matmul_q"
+   ],
+   "hits": 12,
+   "seed": 19351,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "MatMul",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "MatMul",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 147,
+     "want": 146,
+     "slack": 0
+    }
+   },
+   "description": "input a1: uint8[1, 1] = [190]\nconst w2: uint8[1, 1] = [80]\nconst c3: float32[] = [0.000577999977]\nconst c4: uint8[] = [128]\nconst c6: float32[1] = [5.00000108e-40]\nconst c7: uint8[1] = [128]\nconst c10: float32[] = [8.00001293e-42]\nconst c11: uint8[] = [254]\nt5 = DequantizeLinear(a1, c3, c4)\nt8 = DequantizeLinear(w2, c6, c7) {'axis': 1}\nt9 = MatMul(t5, t8)\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "obo-qlinearmatmul-108f5b",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul",
+   "raw_signatures": [
+    "off-by-one|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul"
+   ],
+   "hits": 10,
+   "seed": 450,
+   "ops": [
+    "QLinearMatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearMatMul"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t9",
+    "level": "disable",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0
+     ],
+     "got": 115,
+     "want": 114,
+     "slack": 0
+    }
+   },
+   "description": "input a1: int8[1, 5] = [-128, 94, 0, 0, 127]\nconst c2: float32[] = [0.00400000019]\nconst c3: int8[] = [-56]\nconst w4: int8[5, 1] = [51, 108, 0, 0, -65]\nconst c5: float32[1] = [9.00054004e-42]\nconst c6: int8[1] = [0]\nconst c7: float32[] = [2.0038568e-43]\nconst c8: int8[] = [0]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "obo-conv-8de96b",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>Conv>QuantizeLinear|uint8|extreme-scale|dq_conv_q",
+   "raw_signatures": [
+    "off-by-one|all,extended|Conv|uint8|extreme-scale|dq_conv_q"
+   ],
+   "hits": 9,
+   "seed": 3780,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Conv",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Conv",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QLinearConv"
+    ],
+    "all": [
+     "Transpose",
+     "com.microsoft.QLinearConv",
+     "Transpose"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t12",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 2,
+     "want": 3,
+     "slack": 0
+    }
+   },
+   "description": "input x1: uint8[1, 1, 1, 3] = [139, 25, 255]\nconst c2: float32[] = [2.59996917e-41]\nconst c3: uint8[] = [255]\nconst w5: int8[1, 1, 1, 3] = [10, -95, 0]\nconst c6: float32[1] = [0.000456999987]\nconst c7: int8[1] = [13]\nconst c10: float32[] = [1.13999834e-40]\nconst c11: uint8[] = [0]\nt4 = DequantizeLinear(x1, c2, c3)\nt8 = DequantizeLinear(w5, c6, c7) {'axis': 0}\nt9 = Conv(t4, t8) {'kernel_shape': [1, 3], 'strides': [3, 1]}\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+  },
+  {
+   "id": "obo-conv-relu-7a6628",
+   "cls": "off-by-one",
+   "levels": [
+    "all",
+    "extended"
+   ],
+   "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>DequantizeLinear>Conv>Relu>QuantizeLinear|uint8|extreme-scale|dq_conv_q",
+   "raw_signatures": [
+    "off-by-one|all,extended|Relu|uint8|extreme-scale|dq_conv_q"
+   ],
+   "hits": 1,
+   "seed": 91996,
+   "ops": [
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "DequantizeLinear",
+    "Conv",
+    "Relu",
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "DequantizeLinear",
+     "Conv",
+     "Relu",
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QLinearConv"
+    ],
+    "all": [
+     "Transpose",
+     "com.microsoft.QLinearConv",
+     "Transpose"
+    ]
+   },
+   "detail": {
+    "regime": "extreme-scale",
+    "output": "t16",
+    "level": "extended",
+    "max_excess": 1.0,
+    "max_diff": 1.0,
+    "n_bad": 1,
+    "n_inexact": 1,
+    "example": {
+     "index": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "got": 114,
+     "want": 113,
+     "slack": 0
+    }
+   },
+   "description": "input x1: uint8[1, 16, 1, 3] = [146, 0, 242, 174, 0, 199, 179, 0, 160, 119, 0, 99 ...]\nconst c2: float32[] = [0.015625]\nconst c3: uint8[] = [128]\nconst w5: int8[4, 8, 1, 3] = [0, 19, -22, 0, 4, -48, 0, -38, 115, 0, -117, 107 ...]\nconst c6: float32[] = [5.50738322e-41]\nconst c7: int8[] = [0]\nconst c9: int32[4] = [3302, 0, 0, 0]\nconst c10: float32[] = [8.60397257e-43]\nconst c14: float32[] = [5.60519386e-43]\nconst c15: uint8[] = [0]\nt4 = DequantizeLinear(x1, c2, c3)\nt8 = DequantizeLinear(w5, c6, c7)\nt11 = DequantizeLinear(c9, c10)\nt12 = Conv(t4, t8, t11) {'kernel_shape': [1, 3], 'strides': [1, 2], 'dilations': [1, 2], 'pads': [0, 2, 0, 2], 'group': 2}\nt13 = Relu(t12)\nt16 = QuantizeLinear(t13, c14, c15)\noutputs: t16"
+  },
+  {
+   "id": "rej-convinteger-f1891a",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|ConvInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running ConvInteger node.  Status Message: onnxrunti",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|ConvInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running ConvInteger node.  Status Message: onnxrunti"
+   ],
+   "hits": 1329,
+   "seed": 66,
+   "ops": [
+    "ConvInteger"
+   ],
+   "fused_ops": {
+    "disable": [
+     "ConvInteger"
+    ],
+    "extended": [
+     "ConvInteger"
+    ],
+    "all": [
+     "ConvInteger"
+    ]
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now"
+    },
+    "stage": "run"
+   },
+   "description": "input x1: int8[1, 1, 1, 3] = [0, 0, 0]\nconst w2: int8[2, 1, 5, 2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c3: int8[] = [0]\nconst c4: int8[2] = [0, 0]\nt5 = ConvInteger(x1, w2, c3, c4) {'kernel_shape': [5, 2], 'strides': [2, 1], 'dilations': [1, 2], 'pads': [3, 0, 3, 0]}\noutputs: t5"
+  },
+  {
+   "id": "rej-qlinearmatmul-834f6d",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(N) node with name 'nN_QLin",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(N) node with name 'nN_QLin"
+   ],
+   "hits": 1146,
+   "seed": 162,
+   "ops": [
+    "QLinearMatMul"
+   ],
+   "fused_ops": {
+    "disable": [],
+    "extended": [],
+    "all": []
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'",
+     "extended": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'",
+     "all": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearMatMul(21) node with name 'n0_QLinearMatMul'"
+    },
+    "stage": "load"
+   },
+   "description": "input a1: uint8[1, 1] = [0]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [0]\nconst w4: int8[1, 1] = [0]\nconst c5: float32[] = [1]\nconst c6: int8[] = [0]\nconst c7: float32[] = [1]\nconst c8: int8[] = [0]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "rej-qlinearconv-e7eef0",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|QLinearConv|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(N) node with name 'nN_QLinea",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|QLinearConv|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(N) node with name 'nN_QLinea"
+   ],
+   "hits": 882,
+   "seed": 124,
+   "ops": [
+    "QLinearConv"
+   ],
+   "fused_ops": {
+    "disable": [],
+    "extended": [],
+    "all": []
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'",
+     "extended": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'",
+     "all": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'"
+    },
+    "stage": "load"
+   },
+   "description": "input x1: uint8[1, 1, 1, 1] = [0]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [0]\nconst w4: uint8[1, 1, 2, 1] = [0, 0]\nconst c5: float32[1] = [1]\nconst c6: uint8[1] = [0]\nconst c7: float32[] = [1]\nconst c8: int8[] = [0]\nconst c9: int32[1] = [0]\nt10 = QLinearConv(x1, c2, c3, w4, c5, c6, c7, c8, c9) {'kernel_shape': [2, 1], 'strides': [3, 1], 'dilations': [1, 2], 'pads': [1, 0, 1, 0]}\noutputs: t10"
+  },
+  {
+   "id": "rej-qlinearmatmul-65200e",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QLinearMatMul node.  Status Message: onnxrun",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QLinearMatMul node.  Status Message: onnxrun"
+   ],
+   "hits": 422,
+   "seed": 144,
+   "ops": [
+    "QLinearMatMul"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QLinearMatMul"
+    ],
+    "extended": [
+     "QLinearMatMul"
+    ],
+    "all": [
+     "QLinearMatMul"
+    ]
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus"
+    },
+    "stage": "run"
+   },
+   "description": "input a1: int8[2, 1] = [0, 0]\nconst c2: float32[2] = [1, 1]\nconst c3: int8[2] = [0, 0]\nconst w4: int8[1, 1] = [0]\nconst c5: float32[1] = [1]\nconst c6: int8[1] = [0]\nconst c7: float32[] = [1]\nconst c8: int8[] = [0]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+  },
+  {
+   "id": "rej-matmulinteger-76e216",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|MatMulInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running MatMulInteger node.  Status Message: onnxrun",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|MatMulInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running MatMulInteger node.  Status Message: onnxrun"
+   ],
+   "hits": 265,
+   "seed": 446,
+   "ops": [
+    "MatMulInteger"
+   ],
+   "fused_ops": {
+    "disable": [
+     "MatMulInteger"
+    ],
+    "extended": [
+     "MatMulInteger"
+    ],
+    "all": [
+     "MatMulInteger"
+    ]
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running MatMulInteger node. Name:'n0_MatMulInteger' Status Message: onnxruntime/core/providers/cpu/quantization/matmul_integer.cc:63 virtual onnxruntime::common::Status onnxruntime::MatMulInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_zero_point) was false. MatmulInteger : input1 zero point must b"
+    },
+    "stage": "run"
+   },
+   "description": "input a1: int8[2, 1] = [0, 0]\ninput b2: int8[1, 1] = [0]\nconst c3: int8[2] = [0, 0]\nconst c4: int8[] = [0]\nt5 = MatMulInteger(a1, b2, c3, c4)\noutputs: t5"
+  },
+  {
+   "id": "rej-quantizelinear-286034",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|QuantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|QuantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru"
+   ],
+   "hits": 191,
+   "seed": 289,
+   "ops": [
+    "QuantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear"
+    ]
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens"
+    },
+    "stage": "run"
+   },
+   "description": "input x1: float32[4] = [0, 0, 0, 0]\nconst c2: float32[1] = [1]\nconst c3: int8[1] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 4}\noutputs: t4"
+  },
+  {
+   "id": "rej-dequantizelinear-872574",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|DequantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running DequantizeLinear node.  Status Message: onnx",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|DequantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running DequantizeLinear node.  Status Message: onnx"
+   ],
+   "hits": 161,
+   "seed": 2691,
+   "ops": [
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "DequantizeLinear"
+    ],
+    "all": [
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running DequantizeLinear node. Name:'n0_DequantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running DequantizeLinear node. Name:'n0_DequantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running DequantizeLinear node. Name:'n0_DequantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-"
+    },
+    "stage": "run"
+   },
+   "description": "input x1: uint16[16] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[1] = [1]\nconst c3: uint16[1] = [0]\nt4 = DequantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 32}\noutputs: t4"
+  },
+  {
+   "id": "rej-quantizelinear-dequantizelinear-436772",
+   "cls": "rejects-valid-model",
+   "levels": [
+    "all",
+    "disable",
+    "extended"
+   ],
+   "min_signature": "rejects-valid-model|all,disable,extended|QuantizeLinear>DequantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru",
+   "raw_signatures": [
+    "rejects-valid-model|all,disable,extended|DequantizeLinear+QuantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru"
+   ],
+   "hits": 96,
+   "seed": 235,
+   "ops": [
+    "QuantizeLinear",
+    "DequantizeLinear"
+   ],
+   "fused_ops": {
+    "disable": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "extended": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ],
+    "all": [
+     "QuantizeLinear",
+     "DequantizeLinear"
+    ]
+   },
+   "detail": {
+    "errors": {
+     "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+     "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens"
+    },
+    "stage": "run"
+   },
+   "description": "input x1: float32[3] = [0, 0, 0]\nconst c2: float32[1] = [1]\nconst c3: uint4[1] = [0]\nconst obs_s5: float32[] = [1]\nconst obs_z6: uint4[] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 16}\nt7 = DequantizeLinear(t4, obs_s5, obs_z6)\noutputs: t7"
+  }
+ ]
+}

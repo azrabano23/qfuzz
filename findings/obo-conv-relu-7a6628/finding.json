@@ -1,0 +1,438 @@
+{
+ "id": "obo-conv-relu-7a6628",
+ "cls": "off-by-one",
+ "levels": [
+  "all",
+  "extended"
+ ],
+ "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>DequantizeLinear>Conv>Relu>QuantizeLinear|uint8|extreme-scale|dq_conv_q",
+ "raw_signatures": [
+  "off-by-one|all,extended|Relu|uint8|extreme-scale|dq_conv_q"
+ ],
+ "hits": 1,
+ "seed": 91996,
+ "ops": [
+  "DequantizeLinear",
+  "DequantizeLinear",
+  "DequantizeLinear",
+  "Conv",
+  "Relu",
+  "QuantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "DequantizeLinear",
+   "DequantizeLinear",
+   "DequantizeLinear",
+   "Conv",
+   "Relu",
+   "QuantizeLinear"
+  ],
+  "extended": [
+   "QLinearConv"
+  ],
+  "all": [
+   "Transpose",
+   "com.microsoft.QLinearConv",
+   "Transpose"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t16",
+  "level": "extended",
+  "max_excess": 1.0,
+  "max_diff": 1.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "got": 114,
+   "want": 113,
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "w5",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t8"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "c9",
+     "c10"
+    ],
+    "outputs": [
+     "t11"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "Conv",
+    "inputs": [
+     "t4",
+     "t8",
+     "t11"
+    ],
+    "outputs": [
+     "t12"
+    ],
+    "attrs": {
+     "kernel_shape": [
+      1,
+      3
+     ],
+     "strides": [
+      1,
+      2
+     ],
+     "dilations": [
+      1,
+      2
+     ],
+     "pads": [
+      0,
+      2,
+      0,
+      2
+     ],
+     "group": 2
+    },
+    "domain": ""
+   },
+   {
+    "op": "Relu",
+    "inputs": [
+     "t12"
+    ],
+    "outputs": [
+     "t13"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "t13",
+     "c14",
+     "c15"
+    ],
+    "outputs": [
+     "t16"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     16,
+     1,
+     3
+    ],
+    "data": [
+     146,
+     0,
+     242,
+     174,
+     0,
+     199,
+     179,
+     0,
+     160,
+     119,
+     0,
+     99,
+     129,
+     0,
+     201,
+     95,
+     0,
+     113,
+     229,
+     0,
+     139,
+     238,
+     0,
+     153,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     "N",
+     null,
+     "S0",
+     "S1"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     0.015625
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     128
+    ],
+    "dims": []
+   },
+   {
+    "name": "w5",
+    "dtype": "int8",
+    "shape": [
+     4,
+     8,
+     1,
+     3
+    ],
+    "data": [
+     0,
+     19,
+     -22,
+     0,
+     4,
+     -48,
+     0,
+     -38,
+     115,
+     0,
+     -117,
+     107,
+     0,
+     62,
+     28,
+     0,
+     81,
+     -28,
+     0,
+     70,
+     42,
+     0,
+     -34,
+     -47,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   {
+    "name": "c6",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     5.507383224489396e-41
+    ],
+    "dims": []
+   },
+   {
+    "name": "c7",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c9",
+    "dtype": "int32",
+    "shape": [
+     4
+    ],
+    "data": [
+     3302,
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     null
+    ]
+   },
+   {
+    "name": "c10",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     8.603972570954377e-43
+    ],
+    "dims": []
+   },
+   {
+    "name": "c14",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     5.605193857299268e-43
+    ],
+    "dims": []
+   },
+   {
+    "name": "c15",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t16"
+  ],
+  "meta": {
+   "pattern": "dq_conv_q",
+   "seed": 91996,
+   "gen": 2,
+   "tags": [
+    "relu",
+    "scale-pow2",
+    "scale-subnormal",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input x1: uint8[1, 16, 1, 3] = [146, 0, 242, 174, 0, 199, 179, 0, 160, 119, 0, 99 ...]\nconst c2: float32[] = [0.015625]\nconst c3: uint8[] = [128]\nconst w5: int8[4, 8, 1, 3] = [0, 19, -22, 0, 4, -48, 0, -38, 115, 0, -117, 107 ...]\nconst c6: float32[] = [5.50738322e-41]\nconst c7: int8[] = [0]\nconst c9: int32[4] = [3302, 0, 0, 0]\nconst c10: float32[] = [8.60397257e-43]\nconst c14: float32[] = [5.60519386e-43]\nconst c15: uint8[] = [0]\nt4 = DequantizeLinear(x1, c2, c3)\nt8 = DequantizeLinear(w5, c6, c7)\nt11 = DequantizeLinear(c9, c10)\nt12 = Conv(t4, t8, t11) {'kernel_shape': [1, 3], 'strides': [1, 2], 'dilations': [1, 2], 'pads': [0, 2, 0, 2], 'group': 2}\nt13 = Relu(t12)\nt16 = QuantizeLinear(t13, c14, c15)\noutputs: t16"
+}

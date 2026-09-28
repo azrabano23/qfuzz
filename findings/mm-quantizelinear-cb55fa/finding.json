@@ -1,0 +1,156 @@
+{
+ "id": "mm-quantizelinear-cb55fa",
+ "cls": "mismatch",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "mismatch|all,disable,extended|QuantizeLinear|int8|extreme-scale|quantize",
+ "raw_signatures": [
+  "mismatch|all,disable,extended|QuantizeLinear|int8|extreme-scale|quantize"
+ ],
+ "hits": 32,
+ "seed": 7628,
+ "ops": [
+  "QuantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QuantizeLinear"
+  ],
+  "extended": [
+   "QuantizeLinear"
+  ],
+  "all": [
+   "QuantizeLinear"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t4",
+  "level": "disable",
+  "max_excess": 255.0,
+  "max_diff": 255.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0,
+    2,
+    0
+   ],
+   "got": -128,
+   "want": 127,
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {
+     "axis": 2,
+     "block_size": 16
+    },
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     3,
+     2
+    ],
+    "data": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     Infinity,
+     0.0
+    ],
+    "dims": [
+     "d0",
+     "d1",
+     null,
+     "d3"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     1,
+     2
+    ],
+    "data": [
+     1.9999999867631625e+37,
+     1.0
+    ],
+    "dims": [
+     "d0",
+     "d1",
+     null,
+     "d3"
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "int8",
+    "shape": [
+     1,
+     1,
+     1,
+     2
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "d0",
+     "d1",
+     null,
+     "d3"
+    ]
+   }
+  ],
+  "outputs": [
+   "t4"
+  ],
+  "meta": {
+   "pattern": "quantize",
+   "seed": 7628,
+   "gen": 2,
+   "tags": [
+    "blocked",
+    "scale-huge",
+    "scale-pow2",
+    "scale-subnormal",
+    "scale-tiny",
+    "ties"
+   ],
+   "dtype": "int8"
+  }
+ },
+ "description": "input x1: float32[1, 1, 3, 2] = [0, 0, 0, 0, inf, 0]\nconst c2: float32[1, 1, 1, 2] = [1.99999999e+37, 1]\nconst c3: int8[1, 1, 1, 2] = [0, 0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 2, 'block_size': 16}\noutputs: t4"
+}

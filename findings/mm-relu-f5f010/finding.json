@@ -1,0 +1,203 @@
+{
+ "id": "mm-relu-f5f010",
+ "cls": "mismatch",
+ "levels": [
+  "all",
+  "extended"
+ ],
+ "min_signature": "mismatch|all,extended|QuantizeLinear>DequantizeLinear>QuantizeLinear>DequantizeLinear>Relu|float32|normal|qdq",
+ "raw_signatures": [
+  "mismatch|all,extended|Relu|float32|normal|qdq"
+ ],
+ "hits": 133,
+ "seed": 2131,
+ "ops": [
+  "QuantizeLinear",
+  "DequantizeLinear",
+  "QuantizeLinear",
+  "DequantizeLinear",
+  "Relu"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QuantizeLinear",
+   "DequantizeLinear",
+   "QuantizeLinear",
+   "DequantizeLinear",
+   "Relu"
+  ],
+  "extended": [
+   "QuantizeLinear",
+   "DequantizeLinear",
+   "Relu"
+  ],
+  "all": [
+   "QuantizeLinear",
+   "DequantizeLinear",
+   "Relu"
+  ]
+ },
+ "detail": {
+  "regime": "normal",
+  "output": "t10",
+  "level": "extended",
+  "max_excess": 0.18566656112670898,
+  "max_diff": 0.1953125,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "got": 19999.8046875,
+   "want": 20000,
+   "slack": 0.009645938873291016
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "t4",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t5"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "t5",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t8"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "t8",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "Relu",
+    "inputs": [
+     "t9"
+    ],
+    "outputs": [
+     "t10"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "data": [
+     20000.0
+    ],
+    "dims": [
+     "d0",
+     "d1",
+     "d2",
+     "d3"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint16",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c6",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c7",
+    "dtype": "uint16",
+    "shape": [],
+    "data": [
+     30458
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t10"
+  ],
+  "meta": {
+   "pattern": "qdq",
+   "seed": 2131,
+   "gen": 2,
+   "tags": [
+    "relu",
+    "scale-pow2",
+    "ties"
+   ],
+   "dtype": "uint16",
+   "stages": 2
+  }
+ },
+ "description": "input x1: float32[1, 1, 1, 1] = [20000]\nconst c2: float32[] = [1]\nconst c3: uint16[] = [0]\nconst c6: float32[] = [1]\nconst c7: uint16[] = [30458]\nt4 = QuantizeLinear(x1, c2, c3)\nt5 = DequantizeLinear(t4, c2, c3)\nt8 = QuantizeLinear(t5, c6, c7)\nt9 = DequantizeLinear(t8, c6, c7)\nt10 = Relu(t9)\noutputs: t10"
+}

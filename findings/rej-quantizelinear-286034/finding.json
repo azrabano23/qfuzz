@@ -1,0 +1,120 @@
+{
+ "id": "rej-quantizelinear-286034",
+ "cls": "rejects-valid-model",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "rejects-valid-model|all,disable,extended|QuantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru",
+ "raw_signatures": [
+  "rejects-valid-model|all,disable,extended|QuantizeLinear|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QuantizeLinear node.  Status Message: onnxru"
+ ],
+ "hits": 191,
+ "seed": 289,
+ "ops": [
+  "QuantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QuantizeLinear"
+  ],
+  "extended": [
+   "QuantizeLinear"
+  ],
+  "all": [
+   "QuantizeLinear"
+  ]
+ },
+ "detail": {
+  "errors": {
+   "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+   "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens",
+   "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QuantizeLinear node. Name:'n0_QuantizeLinear' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear.cc:81 void onnxruntime::PrepareForQDQ(const TensorShape&, const Tensor&, const Tensor*, int64_t, int64_t, int64_t&, int64_t&, int64_t&) quant_block_size == 0 was false. block_size must be 0 for per-tens"
+  },
+  "stage": "run"
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {
+     "axis": 0,
+     "block_size": 4
+    },
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "float32",
+    "shape": [
+     4
+    ],
+    "data": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "dims": [
+     null
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [
+     1
+    ],
+    "data": [
+     1.0
+    ],
+    "dims": [
+     null
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "int8",
+    "shape": [
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     null
+    ]
+   }
+  ],
+  "outputs": [
+   "t4"
+  ],
+  "meta": {
+   "pattern": "quantize",
+   "seed": 289,
+   "gen": 2,
+   "tags": [
+    "blocked",
+    "scale-pow2",
+    "ties",
+    "zp-boundary"
+   ],
+   "dtype": "int8"
+  }
+ },
+ "description": "input x1: float32[4] = [0, 0, 0, 0]\nconst c2: float32[1] = [1]\nconst c3: int8[1] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 4}\noutputs: t4"
+}

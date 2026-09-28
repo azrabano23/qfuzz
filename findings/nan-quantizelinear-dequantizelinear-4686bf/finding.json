@@ -1,0 +1,158 @@
+{
+ "id": "nan-quantizelinear-dequantizelinear-4686bf",
+ "cls": "nan-inf",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "nan-inf|all,disable,extended|QuantizeLinear>DequantizeLinear|float32|normal|quantize",
+ "raw_signatures": [
+  "nan-inf|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|normal|quantize"
+ ],
+ "hits": 300,
+ "seed": 7,
+ "ops": [
+  "QuantizeLinear",
+  "DequantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ],
+  "extended": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ],
+  "all": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ]
+ },
+ "detail": {
+  "regime": "normal",
+  "output": "t7",
+  "level": "disable",
+  "max_excess": Infinity,
+  "max_diff": 0.0,
+  "n_bad": 1,
+  "n_inexact": 0,
+  "example": {
+   "index": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "got": -448,
+   "want": "nan",
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {
+     "saturate": 0
+    },
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "t4",
+     "obs_s5",
+     "obs_z6"
+    ],
+    "outputs": [
+     "t7"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "data": [
+     -0.03999999910593033
+    ],
+    "dims": [
+     "d0",
+     "d1",
+     "d2",
+     "d3"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     8.199999865610152e-05
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "float8e4m3fn",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "obs_s5",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "obs_z6",
+    "dtype": "float8e4m3fn",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t7"
+  ],
+  "meta": {
+   "pattern": "quantize",
+   "seed": 7,
+   "gen": 2,
+   "tags": [
+    "saturate0"
+   ],
+   "dtype": "float8e4m3fn"
+  }
+ },
+ "description": "input x1: float32[1, 1, 1, 1] = [-0.0399999991]\nconst c2: float32[] = [8.19999987e-05]\nconst c3: float8e4m3fn[] = [0]\nconst obs_s5: float32[] = [1]\nconst obs_z6: float8e4m3fn[] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'saturate': 0}\nt7 = DequantizeLinear(t4, obs_s5, obs_z6)\noutputs: t7"
+}

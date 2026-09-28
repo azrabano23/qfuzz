@@ -1,0 +1,245 @@
+{
+ "id": "obo-conv-8de96b",
+ "cls": "off-by-one",
+ "levels": [
+  "all",
+  "extended"
+ ],
+ "min_signature": "off-by-one|all,extended|DequantizeLinear>DequantizeLinear>Conv>QuantizeLinear|uint8|extreme-scale|dq_conv_q",
+ "raw_signatures": [
+  "off-by-one|all,extended|Conv|uint8|extreme-scale|dq_conv_q"
+ ],
+ "hits": 9,
+ "seed": 3780,
+ "ops": [
+  "DequantizeLinear",
+  "DequantizeLinear",
+  "Conv",
+  "QuantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "DequantizeLinear",
+   "DequantizeLinear",
+   "Conv",
+   "QuantizeLinear"
+  ],
+  "extended": [
+   "QLinearConv"
+  ],
+  "all": [
+   "Transpose",
+   "com.microsoft.QLinearConv",
+   "Transpose"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t12",
+  "level": "extended",
+  "max_excess": 1.0,
+  "max_diff": 1.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "got": 2,
+   "want": 3,
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {},
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "w5",
+     "c6",
+     "c7"
+    ],
+    "outputs": [
+     "t8"
+    ],
+    "attrs": {
+     "axis": 0
+    },
+    "domain": ""
+   },
+   {
+    "op": "Conv",
+    "inputs": [
+     "t4",
+     "t8"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {
+     "kernel_shape": [
+      1,
+      3
+     ],
+     "strides": [
+      3,
+      1
+     ]
+    },
+    "domain": ""
+   },
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "t9",
+     "c10",
+     "c11"
+    ],
+    "outputs": [
+     "t12"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1,
+     1,
+     3
+    ],
+    "data": [
+     139,
+     25,
+     255
+    ],
+    "dims": [
+     "N",
+     "C",
+     "S0",
+     "S1"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     2.5999691707082656e-41
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     255
+    ],
+    "dims": []
+   },
+   {
+    "name": "w5",
+    "dtype": "int8",
+    "shape": [
+     1,
+     1,
+     1,
+     3
+    ],
+    "data": [
+     10,
+     -95,
+     0
+    ],
+    "dims": [
+     "M",
+     "C",
+     null,
+     null
+    ]
+   },
+   {
+    "name": "c6",
+    "dtype": "float32",
+    "shape": [
+     1
+    ],
+    "data": [
+     0.0004569999873638153
+    ],
+    "dims": [
+     "M"
+    ]
+   },
+   {
+    "name": "c7",
+    "dtype": "int8",
+    "shape": [
+     1
+    ],
+    "data": [
+     13
+    ],
+    "dims": [
+     "M"
+    ]
+   },
+   {
+    "name": "c10",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.1399983396821684e-40
+    ],
+    "dims": []
+   },
+   {
+    "name": "c11",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t12"
+  ],
+  "meta": {
+   "pattern": "dq_conv_q",
+   "seed": 3780,
+   "gen": 2,
+   "tags": [
+    "per-channel",
+    "scale-subnormal",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input x1: uint8[1, 1, 1, 3] = [139, 25, 255]\nconst c2: float32[] = [2.59996917e-41]\nconst c3: uint8[] = [255]\nconst w5: int8[1, 1, 1, 3] = [10, -95, 0]\nconst c6: float32[1] = [0.000456999987]\nconst c7: int8[1] = [13]\nconst c10: float32[] = [1.13999834e-40]\nconst c11: uint8[] = [0]\nt4 = DequantizeLinear(x1, c2, c3)\nt8 = DequantizeLinear(w5, c6, c7) {'axis': 0}\nt9 = Conv(t4, t8) {'kernel_shape': [1, 3], 'strides': [3, 1]}\nt12 = QuantizeLinear(t9, c10, c11)\noutputs: t12"
+}

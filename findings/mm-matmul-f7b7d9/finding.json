@@ -1,0 +1,284 @@
+{
+ "id": "mm-matmul-f7b7d9",
+ "cls": "mismatch",
+ "levels": [
+  "all",
+  "extended"
+ ],
+ "min_signature": "mismatch|all,extended|DequantizeLinear>MatMul|float32|normal|dq_matmul_nbits",
+ "raw_signatures": [
+  "mismatch|all,extended|MatMul|float32|normal|dq_matmul_nbits"
+ ],
+ "hits": 5198,
+ "seed": 44,
+ "ops": [
+  "DequantizeLinear",
+  "MatMul"
+ ],
+ "fused_ops": {
+  "disable": [
+   "DequantizeLinear",
+   "MatMul"
+  ],
+  "extended": [
+   "com.microsoft.MatMulNBits"
+  ],
+  "all": [
+   "com.microsoft.MatMulNBits"
+  ]
+ },
+ "detail": {
+  "regime": "normal",
+  "output": "t6",
+  "level": "extended",
+  "max_excess": 0.006289386749237735,
+  "max_diff": 0.006299257278442383,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0
+   ],
+   "got": -2.3937008380889893,
+   "want": -2.4000000953674316,
+   "slack": 9.870529204647482e-06
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "w1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {
+     "axis": 0,
+     "block_size": 32
+    },
+    "domain": ""
+   },
+   {
+    "op": "MatMul",
+    "inputs": [
+     "a5",
+     "t4"
+    ],
+    "outputs": [
+     "t6"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "a5",
+    "dtype": "float32",
+    "shape": [
+     1,
+     64
+    ],
+    "data": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.5,
+     0.10000000149011612
+    ],
+    "dims": [
+     "M",
+     null
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "w1",
+    "dtype": "uint4",
+    "shape": [
+     64,
+     1
+    ],
+    "data": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     null,
+     null
+    ]
+   },
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [
+     2,
+     1
+    ],
+    "data": [
+     1.0,
+     1.0
+    ],
+    "dims": [
+     null,
+     null
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "uint4",
+    "shape": [
+     2,
+     1
+    ],
+    "data": [
+     0,
+     4
+    ],
+    "dims": [
+     null,
+     null
+    ]
+   }
+  ],
+  "outputs": [
+   "t6"
+  ],
+  "meta": {
+   "pattern": "dq_matmul_nbits",
+   "seed": 44,
+   "gen": 2,
+   "tags": [],
+   "block_size": 32
+  }
+ },
+ "description": "input a5: float32[1, 64] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst w1: uint4[64, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c2: float32[2, 1] = [1, 1]\nconst c3: uint4[2, 1] = [0, 4]\nt4 = DequantizeLinear(w1, c2, c3) {'axis': 0, 'block_size': 32}\nt6 = MatMul(a5, t4)\noutputs: t6"
+}

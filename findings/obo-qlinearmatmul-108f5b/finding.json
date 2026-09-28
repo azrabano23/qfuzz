@@ -1,0 +1,189 @@
+{
+ "id": "obo-qlinearmatmul-108f5b",
+ "cls": "off-by-one",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "off-by-one|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul",
+ "raw_signatures": [
+  "off-by-one|all,disable,extended|QLinearMatMul|int8|extreme-scale|qlinear_matmul"
+ ],
+ "hits": 10,
+ "seed": 450,
+ "ops": [
+  "QLinearMatMul"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QLinearMatMul"
+  ],
+  "extended": [
+   "QLinearMatMul"
+  ],
+  "all": [
+   "QLinearMatMul"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t9",
+  "level": "disable",
+  "max_excess": 1.0,
+  "max_diff": 1.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0
+   ],
+   "got": 115,
+   "want": 114,
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QLinearMatMul",
+    "inputs": [
+     "a1",
+     "c2",
+     "c3",
+     "w4",
+     "c5",
+     "c6",
+     "c7",
+     "c8"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "a1",
+    "dtype": "int8",
+    "shape": [
+     1,
+     5
+    ],
+    "data": [
+     -128,
+     94,
+     0,
+     0,
+     127
+    ],
+    "dims": [
+     "M",
+     "K"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     0.004000000189989805
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     -56
+    ],
+    "dims": []
+   },
+   {
+    "name": "w4",
+    "dtype": "int8",
+    "shape": [
+     5,
+     1
+    ],
+    "data": [
+     51,
+     108,
+     0,
+     0,
+     -65
+    ],
+    "dims": [
+     "K",
+     "N"
+    ]
+   },
+   {
+    "name": "c5",
+    "dtype": "float32",
+    "shape": [
+     1
+    ],
+    "data": [
+     9.0005400363583e-42
+    ],
+    "dims": [
+     "N"
+    ]
+   },
+   {
+    "name": "c6",
+    "dtype": "int8",
+    "shape": [
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "N"
+    ]
+   },
+   {
+    "name": "c7",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     2.0038568039844884e-43
+    ],
+    "dims": []
+   },
+   {
+    "name": "c8",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t9"
+  ],
+  "meta": {
+   "pattern": "qlinear_matmul",
+   "seed": 450,
+   "gen": 2,
+   "tags": [
+    "per-col",
+    "q-boundary",
+    "scale-subnormal",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input a1: int8[1, 5] = [-128, 94, 0, 0, 127]\nconst c2: float32[] = [0.00400000019]\nconst c3: int8[] = [-56]\nconst w4: int8[5, 1] = [51, 108, 0, 0, -65]\nconst c5: float32[1] = [9.00054004e-42]\nconst c6: int8[1] = [0]\nconst c7: float32[] = [2.0038568e-43]\nconst c8: int8[] = [0]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+}

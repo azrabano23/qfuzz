@@ -1,0 +1,173 @@
+{
+ "id": "rej-convinteger-f1891a",
+ "cls": "rejects-valid-model",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "rejects-valid-model|all,disable,extended|ConvInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running ConvInteger node.  Status Message: onnxrunti",
+ "raw_signatures": [
+  "rejects-valid-model|all,disable,extended|ConvInteger|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running ConvInteger node.  Status Message: onnxrunti"
+ ],
+ "hits": 1329,
+ "seed": 66,
+ "ops": [
+  "ConvInteger"
+ ],
+ "fused_ops": {
+  "disable": [
+   "ConvInteger"
+  ],
+  "extended": [
+   "ConvInteger"
+  ],
+  "all": [
+   "ConvInteger"
+  ]
+ },
+ "detail": {
+  "errors": {
+   "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now",
+   "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now",
+   "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running ConvInteger node. Name:'n0_ConvInteger' Status Message: onnxruntime/core/providers/cpu/quantization/conv_integer.cc:52 virtual onnxruntime::common::Status onnxruntime::ConvInteger::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(W_Zero_Point) was false. Non per-tensor quantization is not supported now"
+  },
+  "stage": "run"
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "ConvInteger",
+    "inputs": [
+     "x1",
+     "w2",
+     "c3",
+     "c4"
+    ],
+    "outputs": [
+     "t5"
+    ],
+    "attrs": {
+     "kernel_shape": [
+      5,
+      2
+     ],
+     "strides": [
+      2,
+      1
+     ],
+     "dilations": [
+      1,
+      2
+     ],
+     "pads": [
+      3,
+      0,
+      3,
+      0
+     ]
+    },
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "int8",
+    "shape": [
+     1,
+     1,
+     1,
+     3
+    ],
+    "data": [
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     "N",
+     "C",
+     "S0",
+     "S1"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "w2",
+    "dtype": "int8",
+    "shape": [
+     2,
+     1,
+     5,
+     2
+    ],
+    "data": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "dims": [
+     "M",
+     "C",
+     null,
+     null
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c4",
+    "dtype": "int8",
+    "shape": [
+     2
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "M"
+    ]
+   }
+  ],
+  "outputs": [
+   "t5"
+  ],
+  "meta": {
+   "pattern": "conv_integer",
+   "seed": 66,
+   "gen": 2,
+   "tags": [
+    "per-channel"
+   ]
+  }
+ },
+ "description": "input x1: int8[1, 1, 1, 3] = [0, 0, 0]\nconst w2: int8[2, 1, 5, 2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ...]\nconst c3: int8[] = [0]\nconst c4: int8[2] = [0, 0]\nt5 = ConvInteger(x1, w2, c3, c4) {'kernel_shape': [5, 2], 'strides': [2, 1], 'dilations': [1, 2], 'pads': [3, 0, 3, 0]}\noutputs: t5"
+}

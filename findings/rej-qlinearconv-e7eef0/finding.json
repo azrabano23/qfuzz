@@ -1,0 +1,208 @@
+{
+ "id": "rej-qlinearconv-e7eef0",
+ "cls": "rejects-valid-model",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "rejects-valid-model|all,disable,extended|QLinearConv|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(N) node with name 'nN_QLinea",
+ "raw_signatures": [
+  "rejects-valid-model|all,disable,extended|QLinearConv|[ONNXRuntimeError] : N : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(N) node with name 'nN_QLinea"
+ ],
+ "hits": 882,
+ "seed": 124,
+ "ops": [
+  "QLinearConv"
+ ],
+ "fused_ops": {
+  "disable": [],
+  "extended": [],
+  "all": []
+ },
+ "detail": {
+  "errors": {
+   "disable": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'",
+   "extended": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'",
+   "all": "[ONNXRuntimeError] : 9 : NOT_IMPLEMENTED : Could not find an implementation for QLinearConv(10) node with name 'n0_QLinearConv'"
+  },
+  "stage": "load"
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QLinearConv",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3",
+     "w4",
+     "c5",
+     "c6",
+     "c7",
+     "c8",
+     "c9"
+    ],
+    "outputs": [
+     "t10"
+    ],
+    "attrs": {
+     "kernel_shape": [
+      2,
+      1
+     ],
+     "strides": [
+      3,
+      1
+     ],
+     "dilations": [
+      1,
+      2
+     ],
+     "pads": [
+      1,
+      0,
+      1,
+      0
+     ]
+    },
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "N",
+     "C",
+     "S0",
+     "S1"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "w4",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1,
+     2,
+     1
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "M",
+     "C",
+     null,
+     null
+    ]
+   },
+   {
+    "name": "c5",
+    "dtype": "float32",
+    "shape": [
+     1
+    ],
+    "data": [
+     1.0
+    ],
+    "dims": [
+     "M"
+    ]
+   },
+   {
+    "name": "c6",
+    "dtype": "uint8",
+    "shape": [
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "M"
+    ]
+   },
+   {
+    "name": "c7",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c8",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c9",
+    "dtype": "int32",
+    "shape": [
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "M"
+    ]
+   }
+  ],
+  "outputs": [
+   "t10"
+  ],
+  "meta": {
+   "pattern": "qlinear_conv",
+   "seed": 124,
+   "gen": 2,
+   "tags": [
+    "per-channel",
+    "q-boundary",
+    "rare-type-combo",
+    "scale-tiny",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input x1: uint8[1, 1, 1, 1] = [0]\nconst c2: float32[] = [1]\nconst c3: uint8[] = [0]\nconst w4: uint8[1, 1, 2, 1] = [0, 0]\nconst c5: float32[1] = [1]\nconst c6: uint8[1] = [0]\nconst c7: float32[] = [1]\nconst c8: int8[] = [0]\nconst c9: int32[1] = [0]\nt10 = QLinearConv(x1, c2, c3, w4, c5, c6, c7, c8, c9) {'kernel_shape': [2, 1], 'strides': [3, 1], 'dilations': [1, 2], 'pads': [1, 0, 1, 0]}\noutputs: t10"
+}

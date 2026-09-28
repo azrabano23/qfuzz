@@ -1,0 +1,177 @@
+{
+ "id": "mm-quantizelinear-dequantizelinear-6963b7",
+ "cls": "mismatch",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "mismatch|all,disable,extended|QuantizeLinear>DequantizeLinear|float32|extreme-scale|quantize",
+ "raw_signatures": [
+  "mismatch|all,disable,extended|DequantizeLinear+QuantizeLinear|float32|extreme-scale|quantize"
+ ],
+ "hits": 140,
+ "seed": 1214,
+ "ops": [
+  "QuantizeLinear",
+  "DequantizeLinear"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ],
+  "extended": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ],
+  "all": [
+   "QuantizeLinear",
+   "DequantizeLinear"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t7",
+  "level": "disable",
+  "max_excess": 14.999999165534973,
+  "max_diff": 15.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0,
+    0
+   ],
+   "got": -8,
+   "want": 7,
+   "slack": 8.344650268554688e-07
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QuantizeLinear",
+    "inputs": [
+     "x1",
+     "c2",
+     "c3"
+    ],
+    "outputs": [
+     "t4"
+    ],
+    "attrs": {
+     "axis": 0,
+     "block_size": 2
+    },
+    "domain": ""
+   },
+   {
+    "op": "DequantizeLinear",
+    "inputs": [
+     "t4",
+     "obs_s5",
+     "obs_z6"
+    ],
+    "outputs": [
+     "t7"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "x1",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     1
+    ],
+    "data": [
+     Infinity
+    ],
+    "dims": [
+     null,
+     "d1",
+     "d2"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [
+     1,
+     1,
+     1
+    ],
+    "data": [
+     7.99999994705265e+37
+    ],
+    "dims": [
+     null,
+     "d1",
+     "d2"
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "int4",
+    "shape": [
+     1,
+     1,
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     null,
+     "d1",
+     "d2"
+    ]
+   },
+   {
+    "name": "obs_s5",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "obs_z6",
+    "dtype": "int4",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t7"
+  ],
+  "meta": {
+   "pattern": "quantize",
+   "seed": 1214,
+   "gen": 2,
+   "tags": [
+    "blocked",
+    "sat-boundary",
+    "scale-huge",
+    "scale-pow2",
+    "scale-subnormal",
+    "scale-tiny"
+   ],
+   "dtype": "int4"
+  }
+ },
+ "description": "input x1: float32[1, 1, 1] = [inf]\nconst c2: float32[1, 1, 1] = [7.99999995e+37]\nconst c3: int4[1, 1, 1] = [0]\nconst obs_s5: float32[] = [1]\nconst obs_z6: int4[] = [0]\nt4 = QuantizeLinear(x1, c2, c3) {'axis': 0, 'block_size': 2}\nt7 = DequantizeLinear(t4, obs_s5, obs_z6)\noutputs: t7"
+}

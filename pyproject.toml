@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qfuzz"
+version = "0.1.0"
+description = "Differential fuzzer and exact numerical verifier for quantized ONNX execution in ONNX Runtime."
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "onnx>=1.16", "onnxruntime>=1.18", "ml_dtypes>=0.4"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+qfuzz = "qfuzz.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

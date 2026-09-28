@@ -1,0 +1,184 @@
+{
+ "id": "rej-qlinearmatmul-65200e",
+ "cls": "rejects-valid-model",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QLinearMatMul node.  Status Message: onnxrun",
+ "raw_signatures": [
+  "rejects-valid-model|all,disable,extended|QLinearMatMul|[ONNXRuntimeError] : N : FAIL : Non-zero status code returned while running QLinearMatMul node.  Status Message: onnxrun"
+ ],
+ "hits": 422,
+ "seed": 144,
+ "ops": [
+  "QLinearMatMul"
+ ],
+ "fused_ops": {
+  "disable": [
+   "QLinearMatMul"
+  ],
+  "extended": [
+   "QLinearMatMul"
+  ],
+  "all": [
+   "QLinearMatMul"
+  ]
+ },
+ "detail": {
+  "errors": {
+   "disable": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus",
+   "extended": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus",
+   "all": "[ONNXRuntimeError] : 1 : FAIL : Non-zero status code returned while running QLinearMatMul node. Name:'n0_QLinearMatMul' Status Message: onnxruntime/core/providers/cpu/quantization/quantize_linear_matmul.cc:78 virtual onnxruntime::common::Status onnxruntime::QLinearMatMul::Compute(onnxruntime::OpKernelContext*) const IsScalarOr1ElementVector(a_offset) was false. QLinearMatmul : input zero point mus"
+  },
+  "stage": "run"
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QLinearMatMul",
+    "inputs": [
+     "a1",
+     "c2",
+     "c3",
+     "w4",
+     "c5",
+     "c6",
+     "c7",
+     "c8"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {},
+    "domain": ""
+   }
+  ],
+  "inputs": [
+   {
+    "name": "a1",
+    "dtype": "int8",
+    "shape": [
+     2,
+     1
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "M",
+     "K"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [
+     2
+    ],
+    "data": [
+     1.0,
+     1.0
+    ],
+    "dims": [
+     "M"
+    ]
+   },
+   {
+    "name": "c3",
+    "dtype": "int8",
+    "shape": [
+     2
+    ],
+    "data": [
+     0,
+     0
+    ],
+    "dims": [
+     "M"
+    ]
+   },
+   {
+    "name": "w4",
+    "dtype": "int8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "K",
+     "N"
+    ]
+   },
+   {
+    "name": "c5",
+    "dtype": "float32",
+    "shape": [
+     1
+    ],
+    "data": [
+     1.0
+    ],
+    "dims": [
+     "N"
+    ]
+   },
+   {
+    "name": "c6",
+    "dtype": "int8",
+    "shape": [
+     1
+    ],
+    "data": [
+     0
+    ],
+    "dims": [
+     "N"
+    ]
+   },
+   {
+    "name": "c7",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c8",
+    "dtype": "int8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t9"
+  ],
+  "meta": {
+   "pattern": "qlinear_matmul",
+   "seed": 144,
+   "gen": 2,
+   "tags": [
+    "per-col",
+    "per-row-a",
+    "q-boundary",
+    "scale-subnormal",
+    "scale-tiny",
+    "zp-boundary"
+   ]
+  }
+ },
+ "description": "input a1: int8[2, 1] = [0, 0]\nconst c2: float32[2] = [1, 1]\nconst c3: int8[2] = [0, 0]\nconst w4: int8[1, 1] = [0]\nconst c5: float32[1] = [1]\nconst c6: int8[1] = [0]\nconst c7: float32[] = [1]\nconst c8: int8[] = [0]\nt9 = QLinearMatMul(a1, c2, c3, w4, c5, c6, c7, c8)\noutputs: t9"
+}

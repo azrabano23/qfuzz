@@ -1,0 +1,172 @@
+{
+ "id": "mm-qlinearmul-c80736",
+ "cls": "mismatch",
+ "levels": [
+  "all",
+  "disable",
+  "extended"
+ ],
+ "min_signature": "mismatch|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary",
+ "raw_signatures": [
+  "mismatch|all,disable,extended|QLinearMul|uint8|extreme-scale|qlinear_binary"
+ ],
+ "hits": 62,
+ "seed": 5134,
+ "ops": [
+  "QLinearMul"
+ ],
+ "fused_ops": {
+  "disable": [
+   "com.microsoft.QLinearMul"
+  ],
+  "extended": [
+   "com.microsoft.QLinearMul"
+  ],
+  "all": [
+   "com.microsoft.QLinearMul"
+  ]
+ },
+ "detail": {
+  "regime": "extreme-scale",
+  "output": "t9",
+  "level": "disable",
+  "max_excess": 2.0,
+  "max_diff": 2.0,
+  "n_bad": 1,
+  "n_inexact": 1,
+  "example": {
+   "index": [
+    0,
+    0
+   ],
+   "got": 11,
+   "want": 9,
+   "slack": 0
+  }
+ },
+ "case": {
+  "opset": 21,
+  "nodes": [
+   {
+    "op": "QLinearMul",
+    "inputs": [
+     "a1",
+     "c2",
+     "c3",
+     "b4",
+     "c5",
+     "c6",
+     "c7",
+     "c8"
+    ],
+    "outputs": [
+     "t9"
+    ],
+    "attrs": {},
+    "domain": "com.microsoft"
+   }
+  ],
+  "inputs": [
+   {
+    "name": "a1",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     63
+    ],
+    "dims": [
+     "d0",
+     "d1"
+    ]
+   },
+   {
+    "name": "b4",
+    "dtype": "uint8",
+    "shape": [
+     1,
+     1
+    ],
+    "data": [
+     169
+    ],
+    "dims": [
+     "d0",
+     "d1"
+    ]
+   }
+  ],
+  "inits": [
+   {
+    "name": "c2",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     0.004600000102072954
+    ],
+    "dims": []
+   },
+   {
+    "name": "c3",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     208
+    ],
+    "dims": []
+   },
+   {
+    "name": "c5",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.1999318750013409e-41
+    ],
+    "dims": []
+   },
+   {
+    "name": "c6",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     0
+    ],
+    "dims": []
+   },
+   {
+    "name": "c7",
+    "dtype": "float32",
+    "shape": [],
+    "data": [
+     1.1399563007282387e-41
+    ],
+    "dims": []
+   },
+   {
+    "name": "c8",
+    "dtype": "uint8",
+    "shape": [],
+    "data": [
+     128
+    ],
+    "dims": []
+   }
+  ],
+  "outputs": [
+   "t9"
+  ],
+  "meta": {
+   "pattern": "qlinear_binary",
+   "seed": 5134,
+   "gen": 2,
+   "tags": [
+    "scale-subnormal",
+    "zp-boundary"
+   ],
+   "op": "QLinearMul"
+  }
+ },
+ "description": "input a1: uint8[1, 1] = [63]\ninput b4: uint8[1, 1] = [169]\nconst c2: float32[] = [0.0046000001]\nconst c3: uint8[] = [208]\nconst c5: float32[] = [1.19993188e-41]\nconst c6: uint8[] = [0]\nconst c7: float32[] = [1.1399563e-41]\nconst c8: uint8[] = [128]\nt9 = com.microsoft.QLinearMul(a1, c2, c3, b4, c5, c6, c7, c8)\noutputs: t9"
+}
