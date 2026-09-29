@@ -43,7 +43,8 @@ and from `DequantizeLinear`:
 So for `x = -6.504`: Q1 = round(-6.504 / 1) = -7, DQ1 = -7.0, Q2 = round(-7.0 / 0.001) = -7000,
 DQ2 = -7000 * float32(0.001) = **-7.0000005**. `onnx.reference.ReferenceEvaluator` and `ORT_DISABLE_ALL` both return
 that value. `ORT_ENABLE_BASIC` and `ORT_ENABLE_ALL` return **-6.504**. The same happens with `x = 2.4` (spec 2.0,
-optimized 2.4).
+optimized 2.4). As an independent check, Apache TVM 0.27 (Relax ONNX frontend, `llvm` target) also returns
+`[-7.0000005, 2.0]` for this model.
 
 Other instances found by differential fuzzing (qfuzz, 150k random cases, 653 hits with this root cause, in all of
 which `ORT_DISABLE_ALL` matches the spec):

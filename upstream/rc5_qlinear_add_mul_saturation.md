@@ -18,6 +18,7 @@ The expected value comes from composing the spec formulas (`onnx.defs.get_schema
 
 With `a = 229, a_scale = 3000, b = 1, b_scale = 1, c_scale = 1e-4` (all zero points 0), Add gives
 (687000 + 1) / 1e-4 = 6.87e9, and saturate() gives **255**. `ORT_DISABLE_ALL` returns 255, and the fused kernel returns **0**.
+Apache TVM 0.27 (Relax ONNX frontend, `llvm` target) also returns `[0, 255, 255, 255]` for both models.
 
 **Cause (from reading the source).** The x86 MLAS kernels convert the float result with `cvtps2dq` and only
 saturate afterwards with `packs`/`packus`. Out-of-range lanes become `0x80000000` (INT32_MIN), which then saturates

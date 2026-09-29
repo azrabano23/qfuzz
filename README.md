@@ -8,7 +8,13 @@ graph and written out as a standalone `repro.py`.
 
 The campaign described here ran 150,000 cases against onnxruntime 1.30.0 on a Xeon with AVX-512 VNNI and AMX.
 It found **six root causes of wrong results** and one class of valid models that ORT rejects. Four of the
-wrong-result causes reproduce with ordinary scales. Every one reproduces from a committed script.
+wrong-result causes reproduce with ordinary scales. Every one reproduces from a committed script, and the four
+real bugs have paste-ready upstream reports in [`upstream/`](upstream/README.md).
+
+An optional second backend, **Apache TVM 0.27** (Relax ONNX frontend, `llvm`), ran 20,000 cases with the same
+oracle. It produced zero wrong results on the 16,360 cases it could compile and run. The remaining cases failed
+loudly: one importer bug (int4 initializers), documented unsupported features, and undefined zero scales. See
+[Second backend: Apache TVM](#second-backend-apache-tvm-from-resultstvm_campaignjson).
 
 ## Why this is hard to copy
 
@@ -41,6 +47,7 @@ qfuzz minimize --budget 60                               # -> findings/<id>/{rep
 python scripts/make_triage.py                            # route findings to hand-written root causes
 qfuzz report                                             # -> results/REPORT.md
 python findings/<id>/repro.py --check                    # exit 1 if the discrepancy reproduces
+python upstream/rc1_double_qdq_remover.py                # paste-ready upstream repro (AssertionError = bug present)
 ```
 
 ## Layout
@@ -53,8 +60,10 @@ python findings/<id>/repro.py --check                    # exit 1 if the discrep
 | `src/qfuzz/runner.py`, `oracle.py` | ORT at 3 optimization levels; compare and classify; signature and scale regime |
 | `src/qfuzz/minimize.py` | delta debugger (cut, trim, shrink labeled dims and blocks, ddmin values, round floats) |
 | `src/qfuzz/repro.py` | standalone repro script emitter (numpy + onnx + onnxruntime only) |
-| `src/qfuzz/campaign.py` | crash-isolated subprocess workers (a segfault is recorded and the worker restarts), dedupe |
+| `src/qfuzz/campaign.py` | crash-isolated subprocess workers (a segfault is recorded and the worker restarts), dedupe; `--backend ort\|tvm` |
+| `src/qfuzz/tvm_runner.py` | optional Apache TVM backend (Relax ONNX import, `llvm` build, Relax VM); error-stage classification |
 | `results/campaign.json`, `results/REPORT.md`, `results/triage.json` | campaign output, report and curated triage |
+| `results/tvm_campaign.json`, `results/TVM_REPORT.md`, `results/tvm_triage.json`, `results/tvm_on_ort_findings.json` | TVM campaign, report, triage (`scripts/make_tvm_triage.py`) and ORT findings replayed on TVM |
 | `findings/<id>/` | minimized `repro.py` + `finding.json` for each of the 55 distinct findings; `ISSUE.md` drafts for the two best (superseded by `upstream/`) |
 | `upstream/` | paste-ready bug reports (`*.md`) with standalone repro scripts (`*.py`); see `upstream/README.md` |
 
@@ -178,11 +187,84 @@ offending source lines and lists the related issues. **Nothing has been filed.**
 - ConvInteger rejects per-channel `w_zero_point`.
 - Q/DQ with `block_size>0` and a one-block scale of shape `[1]` is rejected as "per-tensor".
 
+## Second backend: Apache TVM (from `results/tvm_campaign.json`)
+
+`src/qfuzz/tvm_runner.py` runs a case through **Apache TVM 0.27.0**. It imports the model with the Relax
+ONNX frontend (`from_onnx`, with Relay removed upstream), applies `DecomposeOpsForInference` and `LegalizeOps`,
+compiles with `tvm.compile(target="llvm")` and executes on the Relax VM. The result goes through the same exact
+reference and slack oracle as ORT. TVM is optional (`pip install -e '.[tvm]'`, which pulls the `apache-tvm` wheel,
+`py3-none-manylinux_2_28_x86_64`, about 9 s to install here). Tests that need TVM are skipped without it.
+Errors are classified by stage: `tvm-unsupported` (the importer refuses a feature explicitly) or
+`tvm-error-import`, `tvm-error-build` or `tvm-error-run` (anything else).
+
+```bash
+pip install -e '.[tvm]'
+qfuzz run --backend tvm --cases 20000 --workers 2 --out results/tvm_campaign.json
+python scripts/make_tvm_triage.py        # -> results/tvm_triage.json, results/TVM_REPORT.md
+qfuzz show 1455 --pattern dq_matmul_q --backend tvm
+```
+
+The importer has no converter for QLinearMatMul, QLinearConv, ConvInteger or com.microsoft QLinearAdd/Mul, so the
+TVM campaign cycles evenly through the 12 generator patterns built only from ops it converts: Q, DQ, Q->DQ chains,
+DQ->MatMul/Conv/Add/Mul/Relu->Q, MatMulInteger, DynamicQuantizeLinear (+MatMulInteger), DQ(int4)->MatMul and
+two-stage chains.
+
+20,000 cases, 2 workers, 2028 s, on the same machine and ORT/onnx versions as above:
+
+| verdict | cases | share |
+|---|---:|---:|
+| exact | 15,055 | 75.3% |
+| within-bound | 1,305 | 6.5% |
+| tvm-unsupported | 1,333 | 6.7% |
+| tvm-error-import | 2,219 | 11.1% |
+| tvm-error-build | 88 | 0.4% |
+
+**Zero findings.** All 16,360 cases that TVM compiled and ran were bit-exact or inside spec latitude: no mismatch,
+off-by-one, nan-inf or crash. This covers inf and ±3e38 inputs, exact ties, boundary zero points and tiny or huge
+scales, the same edge cases that expose RC4 to RC6 in ORT. TVM's output is bit-identical to ORT `ORT_DISABLE_ALL`
+in 16,069 of those cases. In the other 257 they differ, and TVM's result is inside spec latitude in every one.
+A fault-injection test (`tests/test_tvm.py`) checks that the TVM path really goes
+through the oracle.
+
+The 3,640 cases that did not run split into three hand-triaged groups (`results/tvm_triage.json`):
+
+| group | verdict | cases |
+|---|---|---:|
+| T1: any int4/uint4 initializer fails to import (TensorCopyFromBytes size mismatch) | tvm-importer-bug | 2,219 |
+| T2: features the importer rejects explicitly (not bugs) | unsupported | 1,333 |
+| T3: y_scale = 0 fails at compile time (Divide by zero in constant folding) | spec-undefined | 88 |
+
+T1 is a real importer bug (a loud failure on valid models, not wrong numbers). It also blocks every int4-weight
+graph, so TVM's handling of blocked int4 (ORT's RC2 area) is **untested**. No matching apache/tvm issue was found,
+and no upstream report is drafted for it yet. T2 lists documented limitations. T3 is undefined input.
+
+**ORT's 55 minimized findings replayed on TVM** (`results/tvm_on_ort_findings.json`):
+
+| ORT root cause | TVM verdict per finding |
+|---|---|
+| RC1-double-qdq-remover | exact: 5 |
+| RC2-matmulnbits-accuracy-level | tvm-error-import: 3 |
+| RC3-float8-saturate-false | tvm-unsupported: 2 |
+| RC4-blocked-q-int32-overflow | tvm-unsupported: 10 |
+| RC5-qlinear-binary-overflow | exact: 7, tvm-unsupported: 1 |
+| RC6-requant-float32-extreme-scales | exact: 8, tvm-unsupported: 11 |
+| RC7-rejects-valid | exact: 1, tvm-unsupported: 7 |
+
+TVM gets the spec answer on every RC1 and RC5 case it can import, on 8 of the RC6 degenerate-scale cases and on
+the one RC7 model it accepts. It cannot express RC3 (float8 `saturate=0`) or RC4 (blocked Q) at all. The RC1 and RC5
+upstream reports cite TVM as an independent second implementation.
+
 ## What is real and what is not
 
 - **Real, verified by hand against the spec text and the minimized repro:** RC1, RC3 and RC4 (realistic trigger:
-  an `inf` activation), plus RC5 in its rarer realistic-scale form. For each, `ORT_DISABLE_ALL`, the spec formula
-  and (where applicable) `onnx.reference` agree with qfuzz and disagree with ORT.
+  an `inf` activation), plus RC5 in its rarer realistic-scale form. For each, the spec formula agrees with qfuzz
+  and disagrees with ORT. So does `ORT_DISABLE_ALL` for RC1 and RC5, and ORT's own per-tensor kernel for RC4.
+  `onnx.reference` agrees for RC1 and RC3. For RC4 and RC5 it shares the bug: it casts to int32 before clipping.
+  That is reported separately in `upstream/onnx_reference_quantize_overflow.md`, and it is why the upstream reports
+  do not lean on it there. TVM 0.27 independently returns the spec values for RC1 and RC5.
+  The offending source lines were read for all four (see `upstream/*.md`), and the relevant files are unchanged on
+  ORT `main` as of 2026-09-29. The ORT nightly itself could not be installed from the sandbox, so none of the
+  bugs has been re-run on a nightly build.
 - **Real but degenerate:** RC6, plus most RC5 and RC4 hits. They need scales of 1e-40 to 1e30 or inputs of about
   3e38. They are listed so they don't hide in the noise, not because they matter in practice.
 - **Not a bug:**
@@ -194,6 +276,10 @@ offending source lines and lists the related issues. **Nothing has been filed.**
     side of a rounding tie) and 7,504 are the findings above, mostly RC2.
   - DequantizeLinear of int32 values above 2^24 is not bit-exact: ORT converts int32 to float before
     subtracting and multiplying, which double-rounds. qfuzz accepts this within its 2-ulp latitude.
+- **TVM:** the zero-findings result covers only the op subset TVM imports (T1 and T2 above), on the `llvm` CPU
+  target with the default Relax pipeline. T1 (int4 initializers) is a real but loud TVM importer bug. It is
+  triaged from reading the importer source, and no upstream report has been drafted. T3 (zero scale) is undefined
+  input, not a bug. The TVM findings path was checked with fault injection, but no TVM case needed the minimizer.
 - **Bugs in qfuzz's own reference, found during triage and fixed.** Each of these produced false positives until
   it was fixed:
   1. The float slack lacked an absolute subnormal term, so a subnormal MatMul output was flagged.
@@ -230,7 +316,7 @@ offending source lines and lists the related issues. **Nothing has been filed.**
 
 ## Tests and CI
 
-`pytest -q` (about 15 s, 98 tests) covers:
+`pytest -q` (about 20 s, 122 tests; the TVM tests are skipped when `tvm` is not installed) covers:
 - reference unit tests against hand-computed and spec-example values
 - validity of every generator pattern under `onnx.checker` full_check
 - oracle plumbing, including injected mismatches
@@ -238,18 +324,31 @@ offending source lines and lists the related issues. **Nothing has been filed.**
 - every `findings/*/repro.py`: it must run, and it is skipped if the discrepancy does not reproduce on the local
   ORT/ISA, so CI cannot flake across CPUs
 - the report CLI
+- every `upstream/*.py` script: it must end with `AssertionError: <message>` (bug present) or exit 0 (skipped as
+  "does not reproduce"). The script must be ≤ 40 lines and import only numpy/onnx/onnxruntime, and its `.md` must
+  embed the current copy
+- the TVM backend: error classification, summary fields and committed results, which run without TVM; plus spec
+  ties and saturation, the scalar-rank regression, the unsupported and int4 classification and a fault-injection
+  check, which run with TVM
 
 CI should run:
 
 ```bash
 cd qfuzz && pip install -e '.[test]' && pytest -q
+# optional, to also run the TVM tests:
+pip install -e '.[test,tvm]' && pytest -q tests/test_tvm.py
 ```
 
 ## Next steps
 
-- **Other compilers.** Port the runner to TVM (relay/relax QNN), XLA and StableHLO `uniform_quantize`, TensorRT
-  (explicit Q/DQ), OpenVINO and ORT's non-CPU EPs. The generator, reference and minimizer are backend-agnostic;
-  only `runner.py` changes. Differential runs across EPs of the same ORT build are the cheapest next win.
+- **Other compilers.** TVM is done (see above). Next are XLA and StableHLO `uniform_quantize`, TensorRT (explicit
+  Q/DQ), OpenVINO and ORT's non-CPU EPs. The generator, reference and minimizer are backend-agnostic, and a
+  backend is a `run(case) -> OrtResult` function plus an error classifier (see `tvm_runner.py`). Differential runs
+  across EPs of the same ORT build are the cheapest next win.
+- **TVM follow-ups.** Minimization is still ORT-only: `qfuzz minimize` re-judges with ORT, which did not matter
+  here because TVM had no findings. Once T1 is fixed (or by feeding int4 weights as uint8 plus a shift), re-run
+  `dq_matmul_nbits` on TVM. Also try non-`llvm` targets, and any QDQ-to-integer rewrite passes,
+  which would be TVM's analogue of the ORT fusions where RC1, RC2 and RC5 live.
 - **More operators.** QLinearAveragePool, QLinearSoftmax, QGemm, QAttention, MatMulNBits with explicit
   accuracy levels, and float16 scales (where `precision` matters).
 - **More ISAs.** Pin MLAS ISA dispatch, or run on AVX2-only and ARM runners, to fuzz the `vpmaddubsw` u8s8
