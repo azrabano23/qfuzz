@@ -1,5 +1,7 @@
 # DRAFT (not filed) -- QuantizeLinear (blocked / 4-bit) saturates +inf and |x/scale| >= 2^31 to the wrong end
 
+> Superseded by the paste-ready report [`upstream/rc4_blocked_quantize_saturation.md`](../../upstream/rc4_blocked_quantize_saturation.md). The float->int32 hypothesis below is now confirmed in `qmath.h`.
+
 **Component:** CPU EP `QuantizeLinear` (`onnxruntime/core/providers/cpu/quantization/quantize_linear.cc`)
 **Version:** onnxruntime 1.30.0, Linux x86-64 (AVX-512 VNNI / AMX machine), model opset 21
 

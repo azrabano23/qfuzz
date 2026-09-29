@@ -55,7 +55,8 @@ python findings/<id>/repro.py --check                    # exit 1 if the discrep
 | `src/qfuzz/repro.py` | standalone repro script emitter (numpy + onnx + onnxruntime only) |
 | `src/qfuzz/campaign.py` | crash-isolated subprocess workers (a segfault is recorded and the worker restarts), dedupe |
 | `results/campaign.json`, `results/REPORT.md`, `results/triage.json` | campaign output, report and curated triage |
-| `findings/<id>/` | minimized `repro.py` + `finding.json` for each of the 55 distinct findings; `ISSUE.md` drafts for the two best |
+| `findings/<id>/` | minimized `repro.py` + `finding.json` for each of the 55 distinct findings; `ISSUE.md` drafts for the two best (superseded by `upstream/`) |
+| `upstream/` | paste-ready bug reports (`*.md`) with standalone repro scripts (`*.py`); see `upstream/README.md` |
 
 **Ops and patterns covered.**
 - QuantizeLinear and DequantizeLinear: per-tensor, per-axis and blocked, in uint8, int8, uint16, int16, int4,
@@ -104,10 +105,10 @@ cases in each group, split into realistic scales (inside [1e-12, 1e12]) and extr
 | RC6 requant multiplier folded in float32 breaks with subnormal or huge scales | real, but **degenerate inputs only** | 19 | 0 / 794 |
 | RC7 valid models rejected (type combos, per-row or per-channel zero points, single-block) | conformance gap (loud error, no wrong numbers) | 8 | 4,492 |
 
-`results/REPORT.md` lists every finding with its minimized graph. The best two have upstream issue drafts:
-[`findings/mm-quantizelinear-dequantizelinear-quantize-ce328a/ISSUE.md`](findings/mm-quantizelinear-dequantizelinear-quantize-ce328a/ISSUE.md)
-(RC1) and [`findings/mm-quantizelinear-744260/ISSUE.md`](findings/mm-quantizelinear-744260/ISSUE.md) (RC4).
-**Nothing has been filed.**
+`results/REPORT.md` lists every finding with its minimized graph. **Paste-ready upstream reports** for RC1, RC3, RC4
+and RC5 (plus one for the matching `onnx.reference` bug) are in [`upstream/`](upstream/README.md). Each follows the
+onnxruntime bug-report form, has a ≤40-line inline repro with its real output, quotes the spec text, points at the
+offending source lines and lists the related issues. **Nothing has been filed.**
 
 ### Findings with triage
 
@@ -120,6 +121,8 @@ cases in each group, split into realistic scales (inside [1e-12, 1e12]) and extr
   becomes NaN.
 - The spec defines the graph as the composition of the four ops, so this is a correctness bug in an optimization
   that is on by default.
+- The transformer is registered at Level 1, so `ORT_ENABLE_BASIC` is already affected (source confirmed in
+  `FindNewZeroPointAndScale`). The workaround is `session.disable_double_qdq_remover=1`.
 - Upstream: no matching issue found. Related: #32132 (fused QLinear ops off by k steps) and #28030.
 
 **RC2: MatMulNBits accuracy level (by design).**
@@ -138,7 +141,10 @@ cases in each group, split into realistic scales (inside [1e-12, 1e12]) and extr
   mantissa width. onnx.reference agrees.
 - ORT maps |x| in [480, 496) to ±448 for E4M3FN, even though 479 and 496 map to NaN (non-monotonic).
 - ORT maps (61440, 65536) to NaN instead of ±Inf for E5M2.
-- Found by exhaustive sweep after the fuzzer hit it. Same result for per-tensor, per-axis and blocked.
+- Found by exhaustive sweep after the fuzzer hit it. Same result for per-tensor, per-axis and blocked, and for `Cast`.
+- Mechanism (from the source, `include/onnxruntime/core/common/float8.h`): for E4M3FN an unconditional
+  `val &= 0xFE` maps the NaN code to 448. For E5M2, `val |= 0x7C` ORs the Inf pattern into the mantissa 0x7B, which
+  gives NaN.
 - Upstream: no matching issue found.
 
 **RC4: blocked QuantizeLinear sign flip (real bug).**
@@ -146,13 +152,19 @@ cases in each group, split into realistic scales (inside [1e-12, 1e12]) and extr
 - Any |x/scale| ≥ 2^31 fails, and a negative zero point turns -3e38 into +7 for int4.
 - Probing layouts: 8/16-bit types fail only when the blocked axis is not innermost. int4/uint4 also fail for
   per-axis quantization of the innermost axis. Per-tensor is always correct.
-- Mechanism (hypothesis, not checked in source): float->int32 conversion before the clamp.
+- Mechanism (confirmed in the source, `onnxruntime/core/util/qmath.h`): `static_cast<int32_t>(std::nearbyint(x / sc))`
+  runs *before* `std::clamp`. That is undefined for out-of-range values, and x86 gives INT32_MIN. The per-tensor path
+  uses `MlasQuantizeLinear`, which clamps in float.
+- `onnx.reference` has the same defect (`np.rint(x).astype(np.int32)` before `np.clip`), so it cannot serve as the
+  oracle here. See `upstream/onnx_reference_quantize_overflow.md`.
 - Upstream: no matching issue found.
 
 **RC5: QLinearAdd/QLinearMul overflow (real bug, low likelihood).**
 - Example: uint8 with a=229, a_scale=3000, c_scale=1e-4 gives an exact value of 6.9e9, which should saturate to
   255. The fused QLinearAdd returns 0. The unfused graph is correct.
 - Only 8 of 532 hits used scales inside [1e-12, 1e12].
+- Mechanism (from the source): the x86 MLAS kernels (`qladd_avx2.cpp`, `qladd.cpp`, `qlmul.cpp`) convert with
+  `cvtps2dq` and saturate only afterwards with `packs`/`packus`.
 
 **RC6: extreme scales (real, degenerate).**
 - ORT folds `a_scale*b_scale/y_scale` into one float32 value. That value underflows to subnormal or overflows to
@@ -242,4 +254,5 @@ cd qfuzz && pip install -e '.[test]' && pytest -q
   accuracy levels, and float16 scales (where `precision` matters).
 - **More ISAs.** Pin MLAS ISA dispatch, or run on AVX2-only and ARM runners, to fuzz the `vpmaddubsw` u8s8
   saturation path.
-- **File upstream after review.** Start with RC1 and RC4 (drafts are in `findings/*/ISSUE.md`), then RC3.
+- **File upstream after review.** The reports are ready in `upstream/`. File RC1 first, then RC4, RC3 and RC5, after
+  re-running them on an ORT nightly (the nightly feed was not reachable from the sandbox that produced them).

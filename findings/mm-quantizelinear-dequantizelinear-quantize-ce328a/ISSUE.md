@@ -1,5 +1,7 @@
 # DRAFT (not filed) -- DoubleQDQPairsRemover changes results of Q -> DQ -> Q -> DQ chains with different scales
 
+> Superseded by the paste-ready report [`upstream/rc1_double_qdq_remover.md`](../../upstream/rc1_double_qdq_remover.md) (source location confirmed, re-run output, duplicate search).
+
 **Component:** graph optimizer, `onnxruntime/core/optimizer/double_qdq_pairs_remover.cc`
 **Version:** onnxruntime 1.30.0 (CPU EP, Linux x86-64), onnx 1.23.0; model opset 21
 **Found by:** differential fuzzing against an exact ONNX-spec reference (qfuzz), minimized automatically.
