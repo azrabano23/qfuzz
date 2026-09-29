@@ -15,7 +15,7 @@ if not (ROOT / "pyproject.toml").exists():
 def cmd_run(a) -> int:
     from .campaign import run_campaign
     res = run_campaign(a.cases, a.workers, a.seed_start, a.time_limit, Path(a.work),
-                       log=lambda m: print(m, file=sys.stderr))
+                       log=lambda m: print(m, file=sys.stderr), backend=a.backend)
     out = Path(a.out)
     if out.exists():  # keep previously minimized findings if the campaign is re-run
         old = json.loads(out.read_text())
@@ -51,7 +51,11 @@ def cmd_show(a) -> int:
     from .oracle import judge
     from .repro import describe
     case = generate(a.seed, a.pattern)
-    v = judge(case)
+    if a.backend == "tvm":
+        from . import tvm_runner
+        v = tvm_runner.judge(case)
+    else:
+        v = judge(case)
     print(describe(case))
     print(json.dumps(v.to_json(), indent=1, allow_nan=True))
     if a.minimize:
@@ -74,6 +78,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--work", default=str(ROOT / "work"))
     r.add_argument("--out", default=str(ROOT / "results" / "campaign.json"))
     r.add_argument("--keep-findings", action="store_true")
+    r.add_argument("--backend", choices=["ort", "tvm"], default="ort",
+                   help="ort: 3 optimization levels (default); tvm: Apache TVM Relax, llvm target (optional dep)")
     r.set_defaults(fn=cmd_run)
     m = sub.add_parser("minimize", help="minimize one case per signature and write findings/<id>/repro.py")
     m.add_argument("--campaign", default=str(ROOT / "results" / "campaign.json"))
@@ -90,6 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("seed", type=int)
     s.add_argument("--pattern")
     s.add_argument("--minimize", action="store_true")
+    s.add_argument("--backend", choices=["ort", "tvm"], default="ort")
     s.add_argument("--budget", type=float, default=30.0)
     s.set_defaults(fn=cmd_show)
     a = p.parse_args(argv)

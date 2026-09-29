@@ -1,0 +1,353 @@
+{
+ "env": {
+  "onnxruntime": "1.30.0",
+  "onnx": "1.23.0",
+  "numpy": "2.4.6",
+  "python": "3.11.15",
+  "machine": "x86_64",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "isa": [
+   "avx2",
+   "avx512f",
+   "avx512_vnni",
+   "avx_vnni",
+   "amx_int8",
+   "amx_tile"
+  ],
+  "generator_version": 2,
+  "backend": "tvm",
+  "tvm": "0.27.0",
+  "tvm_target": "llvm"
+ },
+ "config": {
+  "cases": 20000,
+  "workers": 2,
+  "seed_start": 0,
+  "elapsed_s": 2028.3,
+  "levels": [
+   "tvm"
+  ]
+ },
+ "tvm_vs_ort_disable": {
+  "bit_identical": 16069,
+  "differ": 257,
+  "not_compared": 3674
+ },
+ "counts": {
+  "tvm-unsupported": 1333,
+  "exact": 15055,
+  "tvm-error-import": 2219,
+  "within-bound": 1305,
+  "tvm-error-build": 88
+ },
+ "fusion_bitdiff_cases": 0,
+ "by_pattern": {
+  "chain": {
+   "exact": 1659,
+   "tvm-error-build": 7
+  },
+  "dequantize": {
+   "tvm-unsupported": 561,
+   "within-bound": 142,
+   "exact": 621,
+   "tvm-error-import": 343
+  },
+  "dq_binary_q": {
+   "exact": 1461,
+   "within-bound": 206
+  },
+  "dq_conv_q": {
+   "exact": 1553,
+   "within-bound": 69,
+   "tvm-error-build": 45
+  },
+  "dq_matmul_nbits": {
+   "tvm-error-import": 1666
+  },
+  "dq_matmul_q": {
+   "exact": 1542,
+   "within-bound": 89,
+   "tvm-error-build": 36
+  },
+  "dq_relu_q": {
+   "exact": 1667
+  },
+  "dyn_matmul": {
+   "exact": 1645,
+   "within-bound": 21
+  },
+  "dynamic_quantize": {
+   "exact": 1540,
+   "within-bound": 126
+  },
+  "matmul_integer": {
+   "exact": 1667
+  },
+  "qdq": {
+   "exact": 1253,
+   "within-bound": 414
+  },
+  "quantize": {
+   "tvm-unsupported": 772,
+   "tvm-error-import": 210,
+   "exact": 447,
+   "within-bound": 238
+  }
+ },
+ "signatures": [
+  {
+   "signature": "tvm-error-import|DequantizeLinear+MatMul|dq_matmul_nbits|InternalError: Check failed: arr_size == nbytes (N vs. N) : TensorCopyFromBytes: size mismatch",
+   "cls": "tvm-error-import",
+   "count": 1666,
+   "seeds": [
+    10,
+    22,
+    34,
+    46,
+    58
+   ],
+   "example": {
+    "error": "InternalError: Check failed: arr_size == nbytes (256 vs. 512) : TensorCopyFromBytes: size mismatch",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear|dequantize|TypeError: zero_point param datatype should be one of ['intN', 'uintN', 'intN', 'uintN', 'intN', 'uintN', 'floatN'], but",
+   "cls": "tvm-unsupported",
+   "count": 368,
+   "seeds": [
+    13,
+    25,
+    49,
+    97,
+    121
+   ],
+   "example": {
+    "error": "TypeError: zero_point param datatype should be one of ['int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32', 'float16'], but got T.float8_e5m2",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-error-import|DequantizeLinear|dequantize|InternalError: Check failed: arr_size == nbytes (N vs. N) : TensorCopyFromBytes: size mismatch",
+   "cls": "tvm-error-import",
+   "count": 343,
+   "seeds": [
+    73,
+    109,
+    133,
+    193,
+    313
+   ],
+   "example": {
+    "error": "InternalError: Check failed: arr_size == nbytes (2 vs. 3) : TensorCopyFromBytes: size mismatch",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-error-import|DequantizeLinear+QuantizeLinear|quantize|InternalError: Check failed: arr_size == nbytes (N vs. N) : TensorCopyFromBytes: size mismatch",
+   "cls": "tvm-error-import",
+   "count": 210,
+   "seeds": [
+    12,
+    24,
+    192,
+    324,
+    336
+   ],
+   "example": {
+    "error": "InternalError: Check failed: arr_size == nbytes (473 vs. 945) : TensorCopyFromBytes: size mismatch",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|ValueError: QuantizeLinear floatN quantization with saturate=N is not supported yet.",
+   "cls": "tvm-unsupported",
+   "count": 195,
+   "seeds": [
+    0,
+    96,
+    180,
+    240,
+    264
+   ],
+   "example": {
+    "error": "ValueError: QuantizeLinear float8 quantization with saturate=0 is not supported yet.",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|TypeError: zero_point param datatype should be one of ['intN', 'uintN', 'intN', 'uintN', 'intN', 'uintN', 'floatN'], but",
+   "cls": "tvm-unsupported",
+   "count": 194,
+   "seeds": [
+    228,
+    372,
+    468,
+    528,
+    576
+   ],
+   "example": {
+    "error": "TypeError: zero_point param datatype should be one of ['int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32', 'float16'], but got T.float8_e4m3fn",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear|dequantize|ValueError: DequantizeLinear blocked quantization is not supported yet.",
+   "cls": "tvm-unsupported",
+   "count": 183,
+   "seeds": [
+    1,
+    181,
+    205,
+    325,
+    397
+   ],
+   "example": {
+    "error": "ValueError: DequantizeLinear blocked quantization is not supported yet.",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|QuantizeLinear|quantize|ValueError: QuantizeLinear blocked quantization is not supported yet.",
+   "cls": "tvm-unsupported",
+   "count": 161,
+   "seeds": [
+    204,
+    252,
+    420,
+    552,
+    696
+   ],
+   "example": {
+    "error": "ValueError: QuantizeLinear blocked quantization is not supported yet.",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|TypeError: Unsupported output datatype attribute for operation: 'intN",
+   "cls": "tvm-unsupported",
+   "count": 113,
+   "seeds": [
+    144,
+    432,
+    492,
+    612,
+    624
+   ],
+   "example": {
+    "error": "TypeError: Unsupported output datatype attribute for operation: 'int4",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|TypeError: Unsupported output datatype attribute for operation: 'uintN",
+   "cls": "tvm-unsupported",
+   "count": 107,
+   "seeds": [
+    156,
+    216,
+    276,
+    456,
+    660
+   ],
+   "example": {
+    "error": "TypeError: Unsupported output datatype attribute for operation: 'uint4",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-error-build|DequantizeLinear+MatMul+QuantizeLinear|dq_matmul_q|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+   "cls": "tvm-error-build",
+   "count": 36,
+   "seeds": [
+    1455,
+    2019,
+    3003,
+    3087,
+    4551
+   ],
+   "example": {
+    "error": "InternalError: Check failed: fb->value != 0 (0 vs. 0) : Divide by zero",
+    "stage": "build"
+   }
+  },
+  {
+   "signature": "tvm-error-build|Conv+DequantizeLinear+QuantizeLinear|dq_conv_q|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+   "cls": "tvm-error-build",
+   "count": 36,
+   "seeds": [
+    1733,
+    2141,
+    2441,
+    2597,
+    4745
+   ],
+   "example": {
+    "error": "InternalError: Check failed: fb->value != 0 (0 vs. 0) : Divide by zero",
+    "stage": "build"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear|dequantize|TypeError: Unsupported input datatype for operation: floatN",
+   "cls": "tvm-unsupported",
+   "count": 10,
+   "seeds": [
+    3205,
+    9817,
+    12985,
+    14221,
+    15121
+   ],
+   "example": {
+    "error": "TypeError: Unsupported input datatype for operation: float32",
+    "stage": "import"
+   }
+  },
+  {
+   "signature": "tvm-error-build|Conv+DequantizeLinear+QuantizeLinear+Relu|dq_conv_q|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+   "cls": "tvm-error-build",
+   "count": 9,
+   "seeds": [
+    1385,
+    3113,
+    4253,
+    4397,
+    6053
+   ],
+   "example": {
+    "error": "InternalError: Check failed: fb->value != 0 (0 vs. 0) : Divide by zero",
+    "stage": "build"
+   }
+  },
+  {
+   "signature": "tvm-error-build|DequantizeLinear+MatMul+QuantizeLinear|chain|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+   "cls": "tvm-error-build",
+   "count": 7,
+   "seeds": [
+    1787,
+    14531,
+    14579,
+    14783,
+    15707
+   ],
+   "example": {
+    "error": "InternalError: Check failed: fb->value != 0 (0 vs. 0) : Divide by zero",
+    "stage": "build"
+   }
+  },
+  {
+   "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|ValueError: QuantizeLinear blocked quantization is not supported yet.",
+   "cls": "tvm-unsupported",
+   "count": 2,
+   "seeds": [
+    3180,
+    6516
+   ],
+   "example": {
+    "error": "ValueError: QuantizeLinear blocked quantization is not supported yet.",
+    "stage": "import"
+   }
+  }
+ ],
+ "findings": []
+}

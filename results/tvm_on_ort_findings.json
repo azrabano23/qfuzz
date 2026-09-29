@@ -1,0 +1,86 @@
+{
+ "tvm": "0.27.0",
+ "by_root_cause": {
+  "RC5-qlinear-binary-overflow": {
+   "exact": 7,
+   "tvm-unsupported": 1
+  },
+  "RC6-requant-float32-extreme-scales": {
+   "exact": 8,
+   "tvm-unsupported": 11
+  },
+  "RC2-matmulnbits-accuracy-level": {
+   "tvm-error-import": 3
+  },
+  "RC4-blocked-q-int32-overflow": {
+   "tvm-unsupported": 10
+  },
+  "RC1-double-qdq-remover": {
+   "exact": 5
+  },
+  "RC3-float8-saturate-false": {
+   "tvm-unsupported": 2
+  },
+  "RC7-rejects-valid": {
+   "tvm-unsupported": 7,
+   "exact": 1
+  }
+ },
+ "by_finding": {
+  "mm-add-0d23de": "exact",
+  "mm-add-c06392": "exact",
+  "mm-add-d14801": "exact",
+  "mm-conv-5acfa0": "exact",
+  "mm-matmul-6a9f21": "exact",
+  "mm-matmul-e6c919": "tvm-error-import",
+  "mm-matmul-ef058a": "exact",
+  "mm-matmul-f7b7d9": "tvm-error-import",
+  "mm-mul-0a9a3d": "exact",
+  "mm-mul-302968": "exact",
+  "mm-mul-670d5f": "exact",
+  "mm-mul-6eee63": "exact",
+  "mm-qlinearconv-32c8d6": "tvm-unsupported",
+  "mm-qlinearconv-dab856": "tvm-unsupported",
+  "mm-qlinearmatmul-19218d": "tvm-unsupported",
+  "mm-qlinearmatmul-2baa28": "tvm-unsupported",
+  "mm-qlinearmul-408803": "tvm-unsupported",
+  "mm-qlinearmul-c80736": "tvm-unsupported",
+  "mm-quantizelinear-0e4b8c": "tvm-unsupported",
+  "mm-quantizelinear-162487": "tvm-unsupported",
+  "mm-quantizelinear-1c3dbc": "tvm-unsupported",
+  "mm-quantizelinear-36bc7e": "tvm-unsupported",
+  "mm-quantizelinear-744260": "tvm-unsupported",
+  "mm-quantizelinear-b7b255": "tvm-unsupported",
+  "mm-quantizelinear-cb55fa": "tvm-unsupported",
+  "mm-quantizelinear-dequantizelinear-6963b7": "tvm-unsupported",
+  "mm-quantizelinear-dequantizelinear-c2024e": "tvm-unsupported",
+  "mm-quantizelinear-dequantizelinear-quantize-ce328a": "exact",
+  "mm-quantizelinear-dequantizelinear-quantize-ef0593": "exact",
+  "mm-quantizelinear-f7b541": "tvm-unsupported",
+  "mm-relu-f35585": "exact",
+  "mm-relu-f5f010": "exact",
+  "nan-matmul-347847": "tvm-error-import",
+  "nan-quantizelinear-dequantizelinear-4686bf": "tvm-unsupported",
+  "nan-quantizelinear-dequantizelinear-55b8e3": "tvm-unsupported",
+  "nan-quantizelinear-dequantizelinear-quantize-fea0cb": "exact",
+  "obo-conv-8de96b": "exact",
+  "obo-conv-relu-7a6628": "exact",
+  "obo-matmul-7b6d61": "exact",
+  "obo-mul-0602d8": "exact",
+  "obo-mul-61f545": "exact",
+  "obo-qlinearconv-6c81e2": "tvm-unsupported",
+  "obo-qlinearconv-a5e2a9": "tvm-unsupported",
+  "obo-qlinearmatmul-108f5b": "tvm-unsupported",
+  "obo-qlinearmatmul-31f3be": "tvm-unsupported",
+  "obo-qlinearmul-634349": "tvm-unsupported",
+  "obo-qlinearmul-b4fab1": "tvm-unsupported",
+  "rej-convinteger-f1891a": "tvm-unsupported",
+  "rej-dequantizelinear-872574": "tvm-unsupported",
+  "rej-matmulinteger-76e216": "exact",
+  "rej-qlinearconv-e7eef0": "tvm-unsupported",
+  "rej-qlinearmatmul-65200e": "tvm-unsupported",
+  "rej-qlinearmatmul-834f6d": "tvm-unsupported",
+  "rej-quantizelinear-286034": "tvm-unsupported",
+  "rej-quantizelinear-dequantizelinear-436772": "tvm-unsupported"
+ }
+}

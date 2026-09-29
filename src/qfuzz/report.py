@@ -31,24 +31,32 @@ def render(campaign: dict, triage: dict) -> str:
     L.append("# qfuzz campaign report\n")
     L.append(f"ONNX Runtime **{env['onnxruntime']}** (CPU EP), onnx {env['onnx']}, numpy {env['numpy']}, "
              f"Python {env['python']} on `{env['cpu']}` (ISA: {', '.join(env['isa'])}).\n")
+    if env.get("backend") == "tvm":
+        L.append(f"Backend: **Apache TVM {env.get('tvm')}** (Relax ONNX frontend, target `{env.get('tvm_target')}`).\n")
     L.append(f"**{total}** generated cases, {cfg['workers']} workers, {cfg['elapsed_s']} s wall clock, "
-             f"each executed at optimization levels {', '.join(cfg['levels'])} and checked against the exact "
+             f"each executed at {', '.join(cfg['levels'])} and checked against the exact "
              f"reference.\n")
     L.append("## Verdicts\n")
     L.append("| class | cases | share |\n|---|---:|---:|")
-    for c in SEVERITY + ["qfuzz-error"]:
+    for c in SEVERITY + ["qfuzz-error"] + sorted(k for k in counts if k not in SEVERITY + ["qfuzz-error"]):
         if c in counts:
             L.append(f"| {'**' + c + '**' if c in FINDING_CLASSES else c} | {counts[c]} | {100 * counts[c] / total:.2f}% |")
-    L.append(f"\nCases where fusion changed at least one output bit (oracle a, any level vs disable): "
-             f"**{campaign['fusion_bitdiff_cases']}** ({100 * campaign['fusion_bitdiff_cases'] / total:.2f}%).\n")
+    if "tvm_vs_ort_disable" in campaign:
+        t = campaign["tvm_vs_ort_disable"]
+        L.append(f"\nTVM output bit-identical to ORT `ORT_DISABLE_ALL`: **{t['bit_identical']}** cases; differs: "
+                 f"**{t['differ']}**; not compared (TVM or ORT error): {t['not_compared']}.\n")
+    else:
+        L.append(f"\nCases where fusion changed at least one output bit (oracle a, any level vs disable): "
+                 f"**{campaign['fusion_bitdiff_cases']}** ({100 * campaign['fusion_bitdiff_cases'] / total:.2f}%).\n")
     L.append("## Per pattern\n")
-    cols = [c for c in SEVERITY if any(c in v for v in campaign["by_pattern"].values())]
+    allc = SEVERITY + sorted({c for v in campaign["by_pattern"].values() for c in v} - set(SEVERITY))
+    cols = [c for c in allc if any(c in v for v in campaign["by_pattern"].values())]
     L.append("| pattern | " + " | ".join(cols) + " |")
     L.append("|---|" + "---:|" * len(cols))
     for p, v in campaign["by_pattern"].items():
         L.append(f"| {p} | " + " | ".join(str(v.get(c, 0)) for c in cols) + " |")
     L.append("")
-    sigs = [s for s in campaign["signatures"] if s["cls"] in FINDING_CLASSES]
+    sigs = [s for s in campaign["signatures"] if s["cls"] in FINDING_CLASSES or s["cls"].startswith("tvm-")]
     L.append(f"## Raw signatures ({len(sigs)} distinct, before minimization)\n")
     L.append("| class | hits | signature | example seeds |\n|---|---:|---|---|")
     for s in sigs:

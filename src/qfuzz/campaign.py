@@ -20,9 +20,23 @@ from .oracle import FINDING_CLASSES, SEVERITY, judge
 
 
 # ------------------------------------------------------------------ worker
+BACKENDS = ("ort", "tvm")
+
+
+def _case_and_verdict(seed: int, backend: str):
+    if backend == "tvm":
+        from . import tvm_runner
+        # TVM's importer covers a subset of the patterns; cycle through those evenly
+        case = generate(seed, tvm_runner.PATTERNS[seed % len(tvm_runner.PATTERNS)])
+        return case, tvm_runner.judge(case)
+    case = generate(seed)
+    return case, judge(case)
+
+
 def worker_main(argv: list[str]) -> int:
-    """python -m qfuzz.campaign worker START STOP OUT DEADLINE"""
+    """python -m qfuzz.campaign worker START STOP OUT DEADLINE [BACKEND]"""
     start, stop, out, deadline = int(argv[0]), int(argv[1]), argv[2], float(argv[3])
+    backend = argv[4] if len(argv) > 4 else "ort"
     with open(out, "a", buffering=1) as f:
         for seed in range(start, stop):
             if time.time() > deadline:
@@ -31,8 +45,7 @@ def worker_main(argv: list[str]) -> int:
             f.flush()
             t0 = time.time()
             try:
-                case = generate(seed)
-                v = judge(case)
+                case, v = _case_and_verdict(seed, backend)
                 rec = {"seed": seed, "pattern": case.meta["pattern"], "tags": case.meta.get("tags", []),
                        "verdict": v.to_json(), "ms": round(1000 * (time.time() - t0), 1)}
             except Exception as e:  # noqa: BLE001 - a qfuzz bug, not an ORT bug
@@ -43,9 +56,9 @@ def worker_main(argv: list[str]) -> int:
     return 0
 
 
-def _run_shard(start: int, stop: int, out: Path, deadline: float) -> subprocess.Popen:
+def _run_shard(start: int, stop: int, out: Path, deadline: float, backend: str = "ort") -> subprocess.Popen:
     return subprocess.Popen([sys.executable, "-m", "qfuzz.campaign", "worker", str(start), str(stop), str(out),
-                             str(deadline)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                             str(deadline), backend], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def _read_shard(path: Path) -> tuple[list[dict], int | None]:
@@ -66,7 +79,10 @@ def _read_shard(path: Path) -> tuple[list[dict], int | None]:
     return recs, pending
 
 
-def run_campaign(n: int, workers: int, seed_start: int, time_limit: float, work_dir: Path, log=print) -> dict:
+def run_campaign(n: int, workers: int, seed_start: int, time_limit: float, work_dir: Path, log=print,
+                 backend: str = "ort") -> dict:
+    if backend not in BACKENDS:
+        raise ValueError(f"unknown backend {backend!r}")
     work_dir.mkdir(parents=True, exist_ok=True)
     for p in work_dir.glob("shard*.jsonl"):
         p.unlink()
@@ -80,7 +96,7 @@ def run_campaign(n: int, workers: int, seed_start: int, time_limit: float, work_
             shards.append([lo, hi, work_dir / f"shard{w}.jsonl", None])
     crashes: list[dict] = []
     for s in shards:
-        s[3] = _run_shard(s[0], s[1], s[2], deadline)
+        s[3] = _run_shard(s[0], s[1], s[2], deadline, backend)
     while any(s[3] is not None for s in shards):
         time.sleep(0.5)
         for s in shards:
@@ -97,7 +113,7 @@ def run_campaign(n: int, workers: int, seed_start: int, time_limit: float, work_
                         "cls": "crash", "levels": [], "signature": f"crash|rc={p.returncode}",
                         "detail": {"returncode": p.returncode}, "stats": {}}}) + "\n")
                 if pending + 1 < s[1] and time.time() < deadline:
-                    s[3] = _run_shard(pending + 1, s[1], s[2], deadline)
+                    s[3] = _run_shard(pending + 1, s[1], s[2], deadline, backend)
                     continue
             s[3] = None
         done = sum(len(_read_shard(s[2])[0]) for s in shards)
@@ -106,10 +122,10 @@ def run_campaign(n: int, workers: int, seed_start: int, time_limit: float, work_
     records = []
     for s in shards:
         records += _read_shard(s[2])[0]
-    return summarize(records, time.time() - t0, workers, seed_start)
+    return summarize(records, time.time() - t0, workers, seed_start, backend)
 
 
-def env_info() -> dict:
+def env_info(backend: str = "ort") -> dict:
     import onnx
     import onnxruntime as ort
     flags = ""
@@ -127,12 +143,16 @@ def env_info() -> dict:
                      if l.startswith("model name"))
     except (OSError, StopIteration):
         pass
-    return {"onnxruntime": ort.__version__, "onnx": onnx.__version__, "numpy": np.__version__,
-            "python": platform.python_version(), "machine": platform.machine(), "cpu": model, "isa": isa,
-            "generator_version": GENERATOR_VERSION}
+    env = {"onnxruntime": ort.__version__, "onnx": onnx.__version__, "numpy": np.__version__,
+           "python": platform.python_version(), "machine": platform.machine(), "cpu": model, "isa": isa,
+           "generator_version": GENERATOR_VERSION}
+    if backend == "tvm":
+        from . import tvm_runner
+        env.update(backend="tvm", tvm=tvm_runner.version(), tvm_target=tvm_runner.TARGET)
+    return env
 
 
-def summarize(records: list[dict], elapsed: float, workers: int, seed_start: int) -> dict:
+def summarize(records: list[dict], elapsed: float, workers: int, seed_start: int, backend: str = "ort") -> dict:
     by_cls = collections.Counter(r["verdict"]["cls"] for r in records)
     by_pattern: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
     sigs: dict[str, dict] = {}
@@ -142,7 +162,8 @@ def summarize(records: list[dict], elapsed: float, workers: int, seed_start: int
         by_pattern[r["pattern"]][v["cls"]] += 1
         if v.get("stats", {}).get("fusion_bitdiff"):
             fusion_bitdiff += 1
-        if v["cls"] in FINDING_CLASSES or v["cls"] in ("qfuzz-error", "invalid-model", "ref-unsupported"):
+        if v["cls"] in FINDING_CLASSES or v["cls"] in ("qfuzz-error", "invalid-model", "ref-unsupported") \
+                or v["cls"].startswith("tvm-"):
             s = sigs.setdefault(v["signature"], {"signature": v["signature"], "cls": v["cls"], "count": 0,
                                                  "seeds": [], "example": v.get("detail")})
             s["count"] += 1
@@ -150,10 +171,18 @@ def summarize(records: list[dict], elapsed: float, workers: int, seed_start: int
                 s["seeds"].append(r["seed"])
     order = {c: i for i, c in enumerate(SEVERITY + ["qfuzz-error"])}
     sig_list = sorted(sigs.values(), key=lambda s: (order.get(s["cls"], 99), -s["count"]))
+    extra = {}
+    if backend == "tvm":
+        eq = [r["verdict"].get("stats", {}).get("tvm_eq_ort_disable") for r in records]
+        extra["tvm_vs_ort_disable"] = {"bit_identical": sum(e is True for e in eq),
+                                       "differ": sum(e is False for e in eq),
+                                       "not_compared": sum(e is None for e in eq)}
     return {
-        "env": env_info(),
+        "env": env_info(backend),
         "config": {"cases": len(records), "workers": workers, "seed_start": seed_start,
-                   "elapsed_s": round(elapsed, 1), "levels": ["disable", "extended", "all"]},
+                   "elapsed_s": round(elapsed, 1),
+                   "levels": ["tvm"] if backend == "tvm" else ["disable", "extended", "all"]},
+        **extra,
         "counts": dict(by_cls),
         "fusion_bitdiff_cases": fusion_bitdiff,
         "by_pattern": {k: dict(v) for k, v in sorted(by_pattern.items())},
@@ -219,4 +248,5 @@ def minimize_campaign(campaign: dict, findings_dir: Path, per_sig: int = 1, budg
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "worker":
         os.environ.setdefault("OMP_NUM_THREADS", "1")
+        os.environ.setdefault("TVM_NUM_THREADS", "1")
         sys.exit(worker_main(sys.argv[2:]))

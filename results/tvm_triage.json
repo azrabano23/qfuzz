@@ -1,0 +1,243 @@
+{
+ "tvm": "0.27.0",
+ "cases": 20000,
+ "counts": {
+  "tvm-unsupported": 1333,
+  "exact": 15055,
+  "tvm-error-import": 2219,
+  "within-bound": 1305,
+  "tvm-error-build": 88
+ },
+ "tvm_vs_ort_disable": {
+  "bit_identical": 16069,
+  "differ": 257,
+  "not_compared": 3674
+ },
+ "findings": [],
+ "groups": {
+  "T1-int4-initializer-import": {
+   "verdict": "tvm-importer-bug",
+   "title": "T1: any int4/uint4 initializer fails to import (TensorCopyFromBytes size mismatch)",
+   "summary": "`_parse_graph_initializers` turns an INT4/UINT4 TensorProto into an ml_dtypes int4 array via onnx.numpy_helper.to_array (1 byte per element) and wraps it in relax.const, whose TVM int4 tensor is packed (2 elements per byte). The byte counts differ, and the import aborts with `Check failed: arr_size == nbytes`. It happens for int32_data and raw_data encodings alike, so every blocked int4 weight graph (the DQ->MatMul 'MatMulNBits' pattern) is untestable. It is a loud failure on a valid model, and no wrong numbers come out. No matching apache/tvm issue was found (searched 2026-09-29); related: #20124 (ONNX op coverage RFC).",
+   "hits": 2219,
+   "signatures": [
+    {
+     "signature": "tvm-error-import|DequantizeLinear+MatMul|dq_matmul_nbits|InternalError: Check failed: arr_size == nbytes (N vs. N) : TensorCopyFromBytes: size mismatch",
+     "count": 1666,
+     "seeds": [
+      10,
+      22,
+      34,
+      46,
+      58
+     ]
+    },
+    {
+     "signature": "tvm-error-import|DequantizeLinear|dequantize|InternalError: Check failed: arr_size == nbytes (N vs. N) : TensorCopyFromBytes: size mismatch",
+     "count": 343,
+     "seeds": [
+      73,
+      109,
+      133,
+      193,
+      313
+     ]
+    },
+    {
+     "signature": "tvm-error-import|DequantizeLinear+QuantizeLinear|quantize|InternalError: Check failed: arr_size == nbytes (N vs. N) : TensorCopyFromBytes: size mismatch",
+     "count": 210,
+     "seeds": [
+      12,
+      24,
+      192,
+      324,
+      336
+     ]
+    }
+   ]
+  },
+  "T2-unsupported-feature": {
+   "verdict": "unsupported",
+   "title": "T2: features the importer rejects explicitly (not bugs)",
+   "summary": "The importer raises a clear error for: blocked Q/DQ (`block_size>0`), float8 zero points in Q/DQ (E4M3FN/E5M2 are not in its allowed zero-point types), int4/uint4 as QuantizeLinear output, float8 `saturate=0`, and ops that have no converter (QLinearMatMul, QLinearConv, ConvInteger, com.microsoft.QLinearAdd/Mul). The TVM campaign avoids the last group by generating only patterns made of supported ops. The replay of ORT findings still hits it.",
+   "hits": 1333,
+   "signatures": [
+    {
+     "signature": "tvm-unsupported|DequantizeLinear|dequantize|TypeError: zero_point param datatype should be one of ['intN', 'uintN', 'intN', 'uintN', 'intN', 'uintN', 'floatN'], but",
+     "count": 368,
+     "seeds": [
+      13,
+      25,
+      49,
+      97,
+      121
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|ValueError: QuantizeLinear floatN quantization with saturate=N is not supported yet.",
+     "count": 195,
+     "seeds": [
+      0,
+      96,
+      180,
+      240,
+      264
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|TypeError: zero_point param datatype should be one of ['intN', 'uintN', 'intN', 'uintN', 'intN', 'uintN', 'floatN'], but",
+     "count": 194,
+     "seeds": [
+      228,
+      372,
+      468,
+      528,
+      576
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|DequantizeLinear|dequantize|ValueError: DequantizeLinear blocked quantization is not supported yet.",
+     "count": 183,
+     "seeds": [
+      1,
+      181,
+      205,
+      325,
+      397
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|QuantizeLinear|quantize|ValueError: QuantizeLinear blocked quantization is not supported yet.",
+     "count": 161,
+     "seeds": [
+      204,
+      252,
+      420,
+      552,
+      696
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|TypeError: Unsupported output datatype attribute for operation: 'intN",
+     "count": 113,
+     "seeds": [
+      144,
+      432,
+      492,
+      612,
+      624
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|TypeError: Unsupported output datatype attribute for operation: 'uintN",
+     "count": 107,
+     "seeds": [
+      156,
+      216,
+      276,
+      456,
+      660
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|DequantizeLinear|dequantize|TypeError: Unsupported input datatype for operation: floatN",
+     "count": 10,
+     "seeds": [
+      3205,
+      9817,
+      12985,
+      14221,
+      15121
+     ]
+    },
+    {
+     "signature": "tvm-unsupported|DequantizeLinear+QuantizeLinear|quantize|ValueError: QuantizeLinear blocked quantization is not supported yet.",
+     "count": 2,
+     "seeds": [
+      3180,
+      6516
+     ]
+    }
+   ]
+  },
+  "T3-zero-scale-compile-error": {
+   "verdict": "spec-undefined",
+   "title": "T3: y_scale = 0 fails at compile time (Divide by zero in constant folding)",
+   "summary": "All 88 cases have a zero Q/DQ scale. The ONNX spec's formula divides by it, and qfuzz treats a zero scale as undefined (see README 'Spec ambiguities'). ORT accepts these models and returns some value (0 or -128 in the cases checked), and TVM refuses to compile them. Both are acceptable, so this is not a bug.",
+   "hits": 88,
+   "signatures": [
+    {
+     "signature": "tvm-error-build|DequantizeLinear+MatMul+QuantizeLinear|dq_matmul_q|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+     "count": 36,
+     "seeds": [
+      1455,
+      2019,
+      3003,
+      3087,
+      4551
+     ]
+    },
+    {
+     "signature": "tvm-error-build|Conv+DequantizeLinear+QuantizeLinear|dq_conv_q|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+     "count": 36,
+     "seeds": [
+      1733,
+      2141,
+      2441,
+      2597,
+      4745
+     ]
+    },
+    {
+     "signature": "tvm-error-build|Conv+DequantizeLinear+QuantizeLinear+Relu|dq_conv_q|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+     "count": 9,
+     "seeds": [
+      1385,
+      3113,
+      4253,
+      4397,
+      6053
+     ]
+    },
+    {
+     "signature": "tvm-error-build|DequantizeLinear+MatMul+QuantizeLinear|chain|InternalError: Check failed: fb->value != N (N vs. N) : Divide by zero",
+     "count": 7,
+     "seeds": [
+      1787,
+      14531,
+      14579,
+      14783,
+      15707
+     ]
+    }
+   ]
+  }
+ },
+ "untriaged": [],
+ "ort_findings_replayed_on_tvm": {
+  "RC5-qlinear-binary-overflow": {
+   "exact": 7,
+   "tvm-unsupported": 1
+  },
+  "RC6-requant-float32-extreme-scales": {
+   "exact": 8,
+   "tvm-unsupported": 11
+  },
+  "RC2-matmulnbits-accuracy-level": {
+   "tvm-error-import": 3
+  },
+  "RC4-blocked-q-int32-overflow": {
+   "tvm-unsupported": 10
+  },
+  "RC1-double-qdq-remover": {
+   "exact": 5
+  },
+  "RC3-float8-saturate-false": {
+   "tvm-unsupported": 2
+  },
+  "RC7-rejects-valid": {
+   "tvm-unsupported": 7,
+   "exact": 1
+  }
+ }
+}
